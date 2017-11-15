@@ -21,7 +21,7 @@ namespace CaptureMe
 
         public CaptureClass()
         {
-            _capture = new Capture(_filters.VideoInputDevices[0], _filters.AudioInputDevices[0], false);
+            _capture = new Capture(_filters.VideoInputDevices[1], _filters.AudioInputDevices[0], false);
         }
 
         public string[] GetVideoDevices()
@@ -68,12 +68,11 @@ namespace CaptureMe
 
         public void SetVideoSource(int selectedIndex)
         {
-            _capture.
         }
 
         public void SetAudioSource(int selectedIndex)
         {
-            _capture.AudioSource = _capture.AudioSources[selectedIndex];
+            //_capture.AudioSource = _capture.AudioSources[selectedIndex];
         }
 
         private void InitializeCapture()
