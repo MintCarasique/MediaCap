@@ -1,0 +1,15 @@
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\bin\Debug\DirectX.Capture.dll
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\bin\Debug\DirectX.Capture.pdb
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\bin\Debug\DShowNET.dll
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\bin\Debug\DShowNET.pdb
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\obj\Debug\DirectX.Capture.csprojResolveAssemblyReference.cache
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\obj\Debug\DirectX.Capture.csproj.CoreCompileInputs.cache
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\obj\Debug\DirectX.Capture.dll
+D:\Documents\5_Semester\CourseWork\sampgrab_src\DirectX.Capture\obj\Debug\DirectX.Capture.pdb
+D:\Documents\5_Semester\CourseWork\Early Alpha\DirectX.Capture\obj\Debug\DirectX.Capture.csprojResolveAssemblyReference.cache
+D:\Documents\5_Semester\CourseWork\Early Alpha\DirectX.Capture\obj\Debug\DirectX.Capture.csproj.CoreCompileInputs.cache
+D:\Documents\5_Semester\CourseWork\Early Alpha\DirectX.Capture\obj\Debug\DirectX.Capture.dll
+D:\Documents\5_Semester\CourseWork\Early Alpha\DirectX.Capture\obj\Debug\DirectX.Capture.pdb
+D:\Documents\5_Semester\CourseWork\Early Alpha\DirectX.Capture\bin\Debug\DirectX.Capture.dll
+D:\Documents\5_Semester\CourseWork\Early Alpha\DirectX.Capture\bin\Debug\DirectX.Capture.pdb
+D:\Documents\5_Semester\CourseWork\Early Alpha\DirectX.Capture\bin\Debug\DShowNET.dll

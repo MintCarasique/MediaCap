@@ -1,0 +1,12 @@
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\obj\Debug\CaptureMe.csprojResolveAssemblyReference.cache
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\obj\Debug\CaptureMe.csproj.GenerateResource.Cache
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\obj\Debug\CaptureMe.csproj.CoreCompileInputs.cache
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\obj\Debug\CaptureMe.MainForm.resources
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\bin\Debug\DirectX.Capture.dll
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\bin\Debug\DShowNET.dll
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\bin\Debug\MediaCap.exe.config
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\bin\Debug\MediaCap.exe
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\bin\Debug\MediaCap.pdb
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\obj\Debug\MediaCap.Properties.Resources.resources
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\obj\Debug\MediaCap.exe
+D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\obj\Debug\MediaCap.pdb
