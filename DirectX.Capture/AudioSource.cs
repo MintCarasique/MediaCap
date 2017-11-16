@@ -1,28 +1,8 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-//
-//  2007-july-01    HV      - added modifications
-// - Added DSHOWNET conditional for using the older DShowNET library
-//   instead of the DirectShowLib library.
-// - Catch possible excetion if something goes wrong when using the mixer
-//
-// Copyright (C) 2007 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 using System.Runtime.InteropServices; 
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  Represents a physical connector or source on an 
@@ -63,7 +43,6 @@ namespace DirectX.Capture
 			{
 				IAMAudioInputMixer mix = (IAMAudioInputMixer) Pin;
 				bool e;
-//#if NEWCODE
 				try
 				{
 					mix.get_Enable( out e );
@@ -73,28 +52,12 @@ namespace DirectX.Capture
 				{
 					return false;
 				}
-
-//#else
-//				mix.get_Enable( out e );
-//				return( e );
-//#endif
 			}
 
 			set
 			{
 				IAMAudioInputMixer mix = (IAMAudioInputMixer) Pin;
-//#if NEWCODE
-				try
-				{
-					mix.put_Enable(value);
-				}
-				catch
-				{
-					// Do nothing?
-				}
-//#else
-//				mix.put_Enable( value );
-//#endif
+				mix.put_Enable(value);
 			}
 
 		}

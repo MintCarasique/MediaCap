@@ -21,7 +21,7 @@ using System.Runtime.InteropServices.ComTypes;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  Represents a DirectShow filter (e.g. video capture device, 

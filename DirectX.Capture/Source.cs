@@ -14,7 +14,7 @@ using DShowNET;
 #else
 using DirectShowLib;
 #endif
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  Represents a physical connector or source on an audio/video device.

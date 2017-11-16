@@ -1,72 +1,3 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Future Improvements
-// 	- Notify unusual events (disk full, quick logoff) using IMediaEventEx (see AMCap line 1624)
-// 	- Capture stats: IAMDroppedFrames, IQualProp.get_AvgFrameRate
-// 	- Show preview while cued: ICaptureGraphBuilder2.ControlStream lets you stop capture but continue preview
-// 	- Pre-alloc space with ICaptureGraphBuilder2.AllocCapFile(), copy data using ICaptureGraphBuilder2.CopyCaptureFile()
-// 	- Audio preview (why doesn't VirtualDub do audio preview?)
-// 	- Hardware Deinterlacing: "Setting Deinterlace Preferences", or IVMRDeinterlaceControl9
-// 	- Time limit (and TimeRemaining) -> AmCap manually handles the time limit
-//  - Don't destory filter graph when changing compressors, just remove compressor and add new one
-//  - Change VideoFormat (NTSC/PAL), I think you need to use IAMVideoDecoder (WDM only)
-//
-// Copyright (c) 2003 Brian Low
-//
-//	2006-Mar-15		HV		- modified
-//
-// New:
-//  - audio file saving in Windows Media Audio (Wma) format
-//  - audio rendering for TV-cards which have no wired audio
-//    connection, but have an audio driver
-//
-//  2006-Apr-1      HV      - modified
-// New:
-//  - initialize audio source when there is audio but no selected source
-//  - restore audio when audio gets lost for what ever reason
-//  - video file saving in Windows Media Video (Wmv) format
-//
-//  2007-Feb-1      HV       - modified
-// New:
-//  - audio rendering for TV-cards which have no wired audio
-//    audio connection and have no audio driver.
-//  - TV frequency fine tuning
-//
-//  2007-Jun-1      HV       - modified
-// New:
-//  - improved audio rendering for TV-cards having no wired audio
-//  - SampleGrabber functionality added using HeFrame event
-//  - Added VMR9 option
-//  - Added De-Interlace option (using Alpary Deinterlace Filter)
-//  - DirectShowLib/DShowNET compatibility added (via conditional DSHOWNET)
-//  - Visual Studio 2003/2005 compatibility added (via conditional VS2003)
-//  - Improved exception handling upon loss of Audio or Video sources and
-//    property page information
-//
-//   2009-Feb-27    HV       - modified
-// New:
-//  - Add color space (+ quick scan of available color spaces) selection
-//    This color space implementation is partly based on Brian Low's
-//    DirectX.Capture example.
-//  - Add video standard selection (eg PAL_B)
-//  - Use profile for Windows Media audio/video formats, profile should
-//    be in the program directory.
-//  - Add TV tuner initialization window to force user to provide input
-//    on country dependent settings (without proper settings code may fail)
-//  - Removed FM Radio, TV finetuning code to make code example easier to
-//    for SampleGrabber.
-//
-//  2009-Mar-31    HV       - modified
-// Fixed:
-//  - menu Audio Compressor initialized if audio via video device
-//
-// Copyright (C) 2006, 2007, 2008, 2009 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -75,16 +6,11 @@ using System.Reflection;
 using System.Runtime.InteropServices; 
 using System.Threading;
 using System.Windows.Forms;
-
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
 																   
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 
 	/// <summary>
@@ -297,20 +223,6 @@ namespace DirectX.Capture
 	/// </div></code>
 	///  
 	/// <br/>
-	/// <para><b>TV Tuner</b></para>
-	/// 
-	/// <para>
-	///  To access the TV Tuner, use the <see cref="Capture.Tuner"/> property.
-	///  If the device does not have a TV tuner, this property will be null.
-	///  See <see cref="DirectX.Capture.Tuner.Channel"/>, 
-	///  <see cref="DirectX.Capture.Tuner.InputType"/> and 
-	///  <see cref="DirectX.Capture.Tuner.SignalPresent"/> 
-	///  for more information.
-	/// </para>
-	/// <code><div style="background-color:whitesmoke;">
-	///  // Change to channel 5
-	///  capture.Tuner.Channel = 5;
-	/// </div></code>
 	/// 
 	/// <br/>
 	/// <para><b>Troubleshooting</b></para>
@@ -892,7 +804,7 @@ namespace DirectX.Capture
 		///  The TV Tuner or null if the current video device 
 		///  does not have a TV Tuner.
 		/// </summary>
-		public Tuner Tuner { get { return( tuner ); } }
+		//public Tuner Tuner { get { return( tuner ); } }
 	
 		/// <summary>
 		///  Gets and sets the frame rate used to capture video.
@@ -968,9 +880,7 @@ namespace DirectX.Capture
 				bmiHeader.Width = value.Width;
 				bmiHeader.Height = value.Height;
 				setStreamConfigSetting( videoStreamConfig, "BmiHeader", bmiHeader );
-//#if NEWCODE
 				this.videoCaps = null;
-//#endif
 			}		
 		}
 
@@ -1084,16 +994,8 @@ namespace DirectX.Capture
 		protected bool				isCaptureRendered = false;			// When graphState==Rendered, have we rendered the capture stream?
 		protected bool				wantPreviewRendered = false;		// Do we need the preview stream rendered (VideoDevice and PreviewWindow != null)
 		protected bool				wantCaptureRendered = false;		// Do we need the capture stream rendered
-
-#if DSHOWNET
+        
 		protected int				rotCookie = 0;						// Cookie into the Running Object Table
-#else
-        /// <summary>
-        /// Special variable for debugging purposes
-        /// Cookie into the Running Object Table
-        /// </summary>
-        protected DsROTEntry rotCookie = null;
-#endif
         protected Filter			videoDevice = null;					// Property Backer: Video capture device filter
 		protected Filter			audioDevice = null;					// Property Backer: Audio capture device filter
 		protected Filter			videoCompressor = null;				// Property Backer: Video compression filter
@@ -1105,7 +1007,7 @@ namespace DirectX.Capture
 		protected SourceCollection	videoSources = null;				// Property Backer: list of physical video sources
 		protected SourceCollection	audioSources = null;				// Property Backer: list of physical audio sources
 		protected PropertyPageCollection propertyPages = null;			// Property Backer: list of property pages exposed by filters
-		protected Tuner				tuner = null;						// Property Backer: TV Tuner
+		//protected Tuner				tuner = null;						// Property Backer: TV Tuner
 		protected IGraphBuilder		graphBuilder;						// DShow Filter: Graph builder 
 		protected IMediaControl		mediaControl;						// DShow Filter: Start/Stop the filter graph -> copy of graphBuilder
 		protected IVideoWindow		videoWindow;						// DShow Filter: Control preview window -> copy of graphBuilder
@@ -1304,7 +1206,6 @@ namespace DirectX.Capture
 				GC.Collect();
 
 				// Make a new filter graph
-#if DSHOWNET
                 // Make a new filter graph
                 graphBuilder = (IGraphBuilder)Activator.CreateInstance(Type.GetTypeFromCLSID(Clsid.FilterGraph, true));
 
@@ -1312,13 +1213,6 @@ namespace DirectX.Capture
                 Guid clsid = Clsid.CaptureGraphBuilder2;
                 Guid riid = typeof(ICaptureGraphBuilder2).GUID;
                 captureGraphBuilder = (ICaptureGraphBuilder2)DsBugWO.CreateDsInstance(ref clsid, ref riid);
-#else
-				FilterGraph graph = new FilterGraph();
-				graphBuilder = (IGraphBuilder)graph;
-
-				// Get the Capture Graph Builder
-				captureGraphBuilder = (ICaptureGraphBuilder2)new CaptureGraphBuilder2();
-#endif
 
                 // Link the CaptureGraphBuilder to the filter graph
                 hr = captureGraphBuilder.SetFiltergraph(graphBuilder);
@@ -1327,15 +1221,10 @@ namespace DirectX.Capture
                 // Add the graph to the Running Object Table so it can be
                 // viewed with GraphEdit
 #if DEBUG
-#if DSHOWNET
 				DsROT.AddGraphToRot(graphBuilder, out rotCookie);
-#else
-                rotCookie = new DsROTEntry(graphBuilder);
 #endif
-#endif
-
                 // Get the video device and add it to the filter graph
-				if ( VideoDevice != null )
+                if ( VideoDevice != null )
 				{
 					videoDeviceFilter = (IBaseFilter) Marshal.BindToMoniker( VideoDevice.MonikerString );
 					hr = graphBuilder.AddFilter( videoDeviceFilter, "Video Capture Device" );
@@ -1376,63 +1265,32 @@ namespace DirectX.Capture
 				cat = PinCategory.Capture;
 				med = MediaType.Interleaved;
 				Guid iid = typeof(IAMStreamConfig).GUID;
-#if DSHOWNET
                 hr = captureGraphBuilder.FindInterface(
                     ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
-				hr = captureGraphBuilder.FindInterface(
-					DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-#endif
-
 				if ( hr != 0 )
 				{
 					// If not found, try looking for a video media type
 					med = MediaType.Video;
-#if DSHOWNET
                     hr = captureGraphBuilder.FindInterface(
                         ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
-					hr = captureGraphBuilder.FindInterface(
-						DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-#endif
-				
 					if ( hr != 0 )
 						o = null;
 				}
 				videoStreamConfig = o as IAMStreamConfig;
-
-// #if NEWCODE
-				// Start of new Brian's Low code
-				// Retrieve the stream control interface for the video device
-				// FindInterface will also add any required filters
-				// (WDM devices in particular may need additional
-				// upstream filters to function).
-
-				// Try looking for an interleaved media type
+                
 				o = null;
 				cat = PinCategory.Preview;
 				med = MediaType.Interleaved;
 				iid = typeof(IAMStreamConfig).GUID;
-#if DSHOWNET
 				hr = captureGraphBuilder.FindInterface(
 					ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
-				hr = captureGraphBuilder.FindInterface(
-					DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-#endif
 
 				if ( hr != 0 )
 				{
 					// If not found, try looking for a video media type
 					med = MediaType.Video;
-#if DSHOWNET
 					hr = captureGraphBuilder.FindInterface(
 						ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
-					hr = captureGraphBuilder.FindInterface(
-						DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-#endif
-				
 					if ( hr != 0 )
 						o = null;
 				}
@@ -1451,8 +1309,6 @@ namespace DirectX.Capture
 						this.dxUtils = null;
 					}
 				}
-// #endif
-				// Retrieve the stream control interface for the audio device
 				o = null;
 				cat = PinCategory.Capture;
 				med = MediaType.Audio ;
@@ -1460,22 +1316,11 @@ namespace DirectX.Capture
 				if( (this.AudioViaPci)&&
 					(audioDeviceFilter == null)&&(videoDeviceFilter != null) )
 				{
-                    hr = captureGraphBuilder.FindInterface(
-#if DSHOWNET
-						ref cat, ref med, videoDeviceFilter, ref iid, out o );
-#else
-                        DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o);
-#endif
+                    hr = captureGraphBuilder.FindInterface(ref cat, ref med, videoDeviceFilter, ref iid, out o );
 				}
 				else
 				{
-#if DSHOWNET
-                    hr = captureGraphBuilder.FindInterface(
-                        ref cat, ref med, audioDeviceFilter, ref iid, out o);
-#else
-                    hr = captureGraphBuilder.FindInterface(
-	    				DsGuid.FromGuid(cat), DsGuid.FromGuid(med), audioDeviceFilter, DsGuid.FromGuid(iid), out o );
-#endif
+                    hr = captureGraphBuilder.FindInterface(ref cat, ref med, audioDeviceFilter, ref iid, out o);
 				}
 
 				if (hr != 0)
@@ -1501,76 +1346,76 @@ namespace DirectX.Capture
 				// Reload capabilities of video device
 				audioCaps = null;
 
-				// Retrieve TV Tuner if available
-				o = null;
-				cat = PinCategory.Capture;
-				med = MediaType.Interleaved; 
-				iid = typeof(IAMTVTuner).GUID;
-#if DSHOWNET
-                hr = captureGraphBuilder.FindInterface(
-                    ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
+//				// Retrieve TV Tuner if available
+//				o = null;
+//				cat = PinCategory.Capture;
+//				med = MediaType.Interleaved; 
+//				iid = typeof(IAMTVTuner).GUID;
+//#if DSHOWNET
+//                hr = captureGraphBuilder.FindInterface(
+//                    ref cat, ref med, videoDeviceFilter, ref iid, out o);
+//#else
 
-				hr = captureGraphBuilder.FindInterface( 
-					DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-#endif
-				if ( hr != 0 )
-				{
-					med = MediaType.Video ;
-#if DSHOWNET
-                    hr = captureGraphBuilder.FindInterface(
-                        ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
-					hr = captureGraphBuilder.FindInterface( 
-						DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-#endif
-					if ( hr != 0 )
-						o = null;
-				}
-				IAMTVTuner t = o as IAMTVTuner;
-				if ( t != null )
-				{
-					tuner = new Tuner(t);
-					// Do not forget to set proper country code (Netherlands is 31)
-				}
+//				hr = captureGraphBuilder.FindInterface( 
+//					DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
+//#endif
+//				if ( hr != 0 )
+//				{
+//					med = MediaType.Video ;
+//#if DSHOWNET
+//                    hr = captureGraphBuilder.FindInterface(
+//                        ref cat, ref med, videoDeviceFilter, ref iid, out o);
+//#else
+//					hr = captureGraphBuilder.FindInterface( 
+//						DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
+//#endif
+//					if ( hr != 0 )
+//						o = null;
+//				}
+//				IAMTVTuner t = o as IAMTVTuner;
+//				if ( t != null )
+//				{
+//					tuner = new Tuner(t);
+//					// Do not forget to set proper country code (Netherlands is 31)
+//				}
 
-				// No check on TV Audio needed, it will show up in the
-				// PropertyPages when it is available
-				// Code for finding the TV audio interface
-				o = null;
-				cat = PinCategory.Capture;
-				med = MediaType.Interleaved;
-				iid = typeof(IAMTVAudio).GUID;
-				hr = captureGraphBuilder.FindInterface(
-#if DSHOWNET
-					ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
-                    cat, med, videoDeviceFilter, iid, out o);
-#endif
-				if ( hr != 0 )
-				{
-					med = MediaType.Video;
-#if DSHOWNET
-					hr = captureGraphBuilder.FindInterface(
-						ref cat, ref med, videoDeviceFilter, ref iid, out o);
-#else
-				hr = captureGraphBuilder.FindInterface(
-					cat, med, videoDeviceFilter, iid, out o);
-#endif
-					if ( hr != 0 )
-					{
-						o = null;
-					}
-				}
+//				// No check on TV Audio needed, it will show up in the
+//				// PropertyPages when it is available
+//				// Code for finding the TV audio interface
+//				o = null;
+//				cat = PinCategory.Capture;
+//				med = MediaType.Interleaved;
+//				iid = typeof(IAMTVAudio).GUID;
+//				hr = captureGraphBuilder.FindInterface(
+//#if DSHOWNET
+//					ref cat, ref med, videoDeviceFilter, ref iid, out o);
+//#else
+//                    cat, med, videoDeviceFilter, iid, out o);
+//#endif
+//				if ( hr != 0 )
+//				{
+//					med = MediaType.Video;
+//#if DSHOWNET
+//					hr = captureGraphBuilder.FindInterface(
+//						ref cat, ref med, videoDeviceFilter, ref iid, out o);
+//#else
+//				hr = captureGraphBuilder.FindInterface(
+//					cat, med, videoDeviceFilter, iid, out o);
+//#endif
+//					if ( hr != 0 )
+//					{
+//						o = null;
+//					}
+//				}
 
-				if((o != null)&&(tuner != null))
-				{
-					IAMTVAudio a = o as IAMTVAudio;
-					TvAudio = a;
-#if DEBUG
-					Debug.WriteLine("FindInterface tuner.TvAudio");
-#endif // DEBUG
-				}
+//				if((o != null)&&(tuner != null))
+//				{
+//					IAMTVAudio a = o as IAMTVAudio;
+//					TvAudio = a;
+//#if DEBUG
+//					Debug.WriteLine("FindInterface tuner.TvAudio");
+//#endif // DEBUG
+//				}
 
 				/*
 							// ----------- VMR 9 -------------------
@@ -1636,11 +1481,9 @@ namespace DirectX.Capture
 			Guid					med;
 			int						hr;
 			bool					didSomething = false;
-#if DSHOWNET
 			const int WS_CHILD			= 0x40000000;	
 			const int WS_CLIPCHILDREN	= 0x02000000;
 			const int WS_CLIPSIBLINGS	= 0x04000000;
-#endif
 
 			assertStopped();
 
@@ -1693,11 +1536,7 @@ namespace DirectX.Capture
 				}
 
 				// Intialize the Avi or Asf file writer
-#if DSHOWNET
                 hr = captureGraphBuilder.SetOutputFileName(ref mediaSubType, Filename, out muxFilter, out fileWriterFilter);
-#else
-                hr = captureGraphBuilder.SetOutputFileName(mediaSubType, Filename, out muxFilter, out fileWriterFilter);
-#endif
 				if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 				// For Wma (and Wmv) a suitable profile must be selected. This
@@ -1724,19 +1563,11 @@ namespace DirectX.Capture
 					// it's the only way to get audio as well as video
 					cat = PinCategory.Capture;
 					med = MediaType.Interleaved;
-#if DSHOWNET
                     hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, videoCompressorfilter, muxFilter);
-#else
-					hr = captureGraphBuilder.RenderStream( DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, videoCompressorFilter, muxFilter ); 
-#endif
 					if( hr < 0 ) 
 					{
 						med = MediaType.Video;
-#if DSHOWNET
                         hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, videoCompressorfilter, muxFilter);
-#else
-						hr = captureGraphBuilder.RenderStream( DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, videoCompressorFilter, muxFilter ); 
-#endif
 						if ( hr == -2147220969 ) throw new DeviceInUseException( "Video device", hr );
 						if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 					}
@@ -1751,11 +1582,7 @@ namespace DirectX.Capture
 					// which supports audio!
 					cat = PinCategory.Capture;
 					med = MediaType.Audio;
-#if DSHOWNET
 					hr = captureGraphBuilder.RenderStream( ref cat, ref med, audioDeviceFilter, audioCompressorFilter, muxFilter ); 
-#else
-					hr = captureGraphBuilder.RenderStream( DsGuid.FromGuid(cat), DsGuid.FromGuid(med), audioDeviceFilter, audioCompressorFilter, muxFilter );
-#endif
 					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 				else
@@ -1764,11 +1591,7 @@ namespace DirectX.Capture
 				{
 					cat = PinCategory.Capture;
 					med = MediaType.Audio;
-#if DSHOWNET
 					hr = captureGraphBuilder.RenderStream( ref cat, ref med, videoDeviceFilter, audioCompressorFilter, muxFilter );
-#else
-                    hr = captureGraphBuilder.RenderStream(cat, med, videoDeviceFilter, audioCompressorFilter, muxFilter);
-#endif
 					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 
@@ -1788,26 +1611,16 @@ namespace DirectX.Capture
 				// An alternative is to use VMR9
                 cat = PinCategory.Preview;
 				med = MediaType.Video;
-// #if NEWCODE
 				if(this.InitSampleGrabber())
 				{
 					Debug.WriteLine("SampleGrabber added to graph.");
-
-#if DSHOWNET
-					hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, this.baseGrabFlt, this.videoRendererFilter); 
-#else
-					hr = captureGraphBuilder.RenderStream(DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, this.baseGrabFlt, this.videoRendererFilter); 
-#endif
+                    
+					hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, this.baseGrabFlt, this.videoRendererFilter);
 					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 				else
-// #endif NEWCODE
 				{
-#if DSHOWNET
 					hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, null, this.videoRendererFilter);
-#else
-					hr = captureGraphBuilder.RenderStream(DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, null, this.videoRendererFilter); 
-#endif
 					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 
@@ -1816,11 +1629,7 @@ namespace DirectX.Capture
 				{
 					cat = PinCategory.Preview;
 					med = MediaType.Audio;
-#if DSHOWNET
 					hr = captureGraphBuilder.RenderStream( ref cat, ref med, audioDeviceFilter, null, null ); 
-#else
-                    hr = captureGraphBuilder.RenderStream(DsGuid.FromGuid(cat), DsGuid.FromGuid(med), audioDeviceFilter, null, null);
-#endif
 					if( hr < 0 )
 					{
 						Marshal.ThrowExceptionForHR( hr );
@@ -1832,11 +1641,7 @@ namespace DirectX.Capture
 				{
 					cat = PinCategory.Preview;
 					med = MediaType.Audio;
-#if DSHOWNET
 					hr = captureGraphBuilder.RenderStream( ref cat, ref med, videoDeviceFilter, null, null ); 
-#else
-                    hr = captureGraphBuilder.RenderStream(cat, med, videoDeviceFilter, null, null);
-#endif
 					if( hr < 0 )
 					{
 						Marshal.ThrowExceptionForHR( hr );
@@ -1851,11 +1656,7 @@ namespace DirectX.Capture
 				if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 				// Set video window style
-#if DSHOWNET
 				hr = videoWindow.put_WindowStyle( WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
-#else
-			    hr = videoWindow.put_WindowStyle(WindowStyle.Child | WindowStyle.ClipChildren | WindowStyle.ClipSiblings);
-#endif
 				if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 				// Position video window in client rect of owner window
@@ -1863,18 +1664,12 @@ namespace DirectX.Capture
 				onPreviewWindowResize( this, null );
 
 				// Make the video window visible, now that it is properly positioned
-#if DSHOWNET
 				hr = videoWindow.put_Visible( DsHlp.OATRUE );
-#else
-				hr = videoWindow.put_Visible( OABool.True );
-#endif
 				if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 				isPreviewRendered = true;
 				didSomething = true;
-// #if NEWCODE
 				SetMediaSampleGrabber();
-// #endif NEWCODE
 			}
 
 			if ( didSomething )
@@ -1929,11 +1724,7 @@ namespace DirectX.Capture
 			// Free the preview window (ignore errors)
 			if ( videoWindow != null )
 			{
-#if DSHOWNET
                 videoWindow.put_Visible(DsHlp.OAFALSE);
-#else
-                videoWindow.put_Visible(OABool.False);
-#endif
 				videoWindow.put_Owner( IntPtr.Zero );
 				videoWindow = null;
 			}
@@ -2001,20 +1792,11 @@ namespace DirectX.Capture
 			{
 				// Loop through each pin
 				IPin[] pins = new IPin[1];
-#if VS2003 || DSHOWNET
 				int f;
-#else
-                IntPtr f = IntPtr.Zero;
-#endif
 				do
 				{
 					// Get the next pin
-
-#if VS2003 || DSHOWNET
 					hr = pinEnum.Next( 1, pins, out f );
-#else
-                    hr = pinEnum.Next(1, pins, f);
-#endif
 					if( (hr == 0) && (pins[0] != null) )
 					{
 						// Get the pin it is connected to
@@ -2073,19 +1855,11 @@ namespace DirectX.Capture
 			isPreviewRendered = false;
 
             // Remove graph from the ROT
-#if DSHOWNET
 			if ( rotCookie != 0 )
 			{
 				DsROT.RemoveGraphFromRot( ref rotCookie );
 				rotCookie = 0;
 			}
-#else
-            if (rotCookie != null)
-            {
-                rotCookie.Dispose();
-                rotCookie = null;
-            }
-#endif
 
             // Remove filters from the graph
 			// This should be unnecessary but the Nvidia WDM
@@ -2115,10 +1889,6 @@ namespace DirectX.Capture
 			if ( audioSources != null )
 				audioSources.Dispose(); audioSources = null;
             this.PropertyPages = null; // Disposal done within PropertyPages
-			if ( tuner != null )
-				tuner.Dispose(); tuner = null;
-
-// #if NEWCODE
 			if(this.tvAudio != null)
 			{
 				Marshal.ReleaseComObject(this.tvAudio); tvAudio = null;
@@ -2129,7 +1899,6 @@ namespace DirectX.Capture
 				this.dxUtils.Dispose();
 				this.dxUtils = null;
 			}
-// #endif
 
 			// Cleanup
 			if ( graphBuilder != null )
@@ -2148,9 +1917,7 @@ namespace DirectX.Capture
 				Marshal.ReleaseComObject( videoCompressorFilter ); videoCompressorFilter = null;
 			if ( audioCompressorFilter != null )
 				Marshal.ReleaseComObject( audioCompressorFilter ); audioCompressorFilter = null;
-// #if NEWCODE
 			this.DisposeSampleGrabber();
-// #endif
 
 			if(this.videoRendererFilter != null)
 			{
@@ -2219,25 +1986,16 @@ namespace DirectX.Capture
 			derenderGraph();
 
 			object returnValue = null;
-#if DSHOWNET
 			IntPtr pmt = IntPtr.Zero;
-#endif
 			AMMediaType mediaType = new AMMediaType();
 
 			try 
 			{
 				// Get the current format info
-#if DSHOWNET
                 int hr = streamConfig.GetFormat(out pmt);
-#else
-				int hr = streamConfig.GetFormat(out mediaType);
-#endif
 				if ( hr != 0 )
 					Marshal.ThrowExceptionForHR( hr );
-
-#if DSHOWNET
 				Marshal.PtrToStructure( pmt, mediaType );
-#endif
 
 				// The formatPtr member points to different structures
 				// dependingon the formatType
@@ -2267,9 +2025,7 @@ namespace DirectX.Capture
 			finally
 			{
 				DsUtils.FreeAMMediaType( mediaType );
-#if DSHOWNET
 				Marshal.FreeCoTaskMem( pmt );
-#endif
 			}
 			renderGraph();
 			startPreviewIfNeeded();
@@ -2294,25 +2050,16 @@ namespace DirectX.Capture
 			derenderGraph();
 
 			object returnValue = null;
-#if DSHOWNET
             IntPtr pmt = IntPtr.Zero;
-#endif
             AMMediaType mediaType = new AMMediaType();
 
 			try 
 			{
 				// Get the current format info
-#if DSHOWNET
                 int hr = streamConfig.GetFormat(out pmt);
-#else
-				int hr = streamConfig.GetFormat(out mediaType);
-#endif
 				if ( hr != 0 )
 					Marshal.ThrowExceptionForHR( hr );
-
-#if DSHOWNET
                 Marshal.PtrToStructure(pmt, mediaType);
-#endif
 
 				// The formatPtr member points to different structures
 				// dependingon the formatType
@@ -2357,9 +2104,7 @@ namespace DirectX.Capture
 			finally
 			{
 				DsUtils.FreeAMMediaType( mediaType );
-#if DSHOWNET
                 Marshal.FreeCoTaskMem(pmt);
-#endif
             }
 			renderGraph();
 			startPreviewIfNeeded();
@@ -2375,17 +2120,15 @@ namespace DirectX.Capture
 			if ( !Stopped )
 				throw new InvalidOperationException( "This operation not allowed while Capturing. Please Stop the current capture." ); 
 		}
-
-// #if NEWCODE
-#if DSHOWNET
+        
 		/// <summary>
 		/// CLSID_VideoRenderer
 		/// </summary>
 		[ComImport, Guid("70e102b0-5556-11ce-97c0-00aa0055595a")]
 			public class VideoRenderer
 		{
+
 		}
-#endif
 
 		/// <summary>
 		/// Use VMR9 flag, if false use the video renderer instead
@@ -2444,8 +2187,7 @@ namespace DirectX.Capture
 				tvAudio = value;
 			}
 		}
-
-#if DSHOWNET
+        
 		/// <summary>
 		/// From AMTVAudioEventType
 		/// </summary>
@@ -2508,7 +2250,6 @@ namespace DirectX.Capture
 			/// <summary> Language C </summary>
 			LangC = 0x0040,
 		}
-#endif
 
 		private Filter deInterlace = null;
 		private IBaseFilter deInterlaceFilter = null;
@@ -2566,8 +2307,7 @@ namespace DirectX.Capture
 			}
 			return false;
 		}
-
-#if DSHOWNET
+        
 		/// <summary>
 		/// CLSID_SampleGrabber
 		/// </summary>
@@ -2575,7 +2315,6 @@ namespace DirectX.Capture
 			public class SampleGrabber
 		{
 		}
-#endif
 		/// <summary>
 		/// SampleGrabber flag, if false do not insert SampleGrabber in graph
 		/// </summary>
@@ -2691,12 +2430,8 @@ namespace DirectX.Capture
 			{
 				return false;
 			}
-
-#if DSHOWNET
+            
 			this.baseGrabFlt	= (IBaseFilter)this.sampGrabber;
-#else
-            this.baseGrabFlt = sampGrabber as IBaseFilter;
-#endif
 
 			if(this.baseGrabFlt == null)
 			{
@@ -2859,7 +2594,6 @@ namespace DirectX.Capture
 			}
 			return false;
 		}
-//#endif
 // Start of Brian's Low new code
 
 		/// <summary>

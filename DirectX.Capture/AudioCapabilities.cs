@@ -1,31 +1,9 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-//
-// Copyright (c) 2003 Brian Low
-//
-//  2007-July-01    HV      - added modifications
-// - Added DSHOWNET conditional for using the older DShowNET library
-//   instead of the DirectShowLib library
-//
-// Copyright (C) 2007 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
-
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  Capabilities of the audio device such as 
@@ -76,9 +54,7 @@ namespace DirectX.Capture
 			AMMediaType mediaType = null;
 			AudioStreamConfigCaps caps = null;
 			IntPtr pCaps = IntPtr.Zero;
-#if DSHOWNET
 			IntPtr pMediaType;
-#endif
 			try
 			{
 				// Ensure this device reports capabilities
@@ -98,17 +74,11 @@ namespace DirectX.Capture
 				pCaps = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(AudioStreamConfigCaps))); 
 
 				// Retrieve first (and hopefully only) capabilities struct
-#if DSHOWNET
 				hr = audioStreamConfig.GetStreamCaps(0, out pMediaType, pCaps );
-#else
-                hr = audioStreamConfig.GetStreamCaps(0, out mediaType, pCaps);
-#endif
 				if ( hr != 0 ) Marshal.ThrowExceptionForHR( hr );
 
 				// Convert pointers to managed structures
-#if DSHOWNET
 				mediaType = (AMMediaType) Marshal.PtrToStructure( pMediaType, typeof( AMMediaType ) );
-#endif
 				caps = (AudioStreamConfigCaps) Marshal.PtrToStructure( pCaps, typeof( AudioStreamConfigCaps ) );
 
 				// Extract info

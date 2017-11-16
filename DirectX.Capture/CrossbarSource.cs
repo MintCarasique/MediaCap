@@ -1,21 +1,8 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-// ------------------------------------------------------------------
-
 using System;
 using System.Runtime.InteropServices; 
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  Represents a physical connector or source on an 

@@ -16,7 +16,7 @@ using DShowNET;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  The property page to configure a Video for Windows compliant

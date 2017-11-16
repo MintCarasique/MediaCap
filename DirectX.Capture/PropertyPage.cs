@@ -22,7 +22,7 @@ using DShowNET;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  A base class for representing property pages exposed by filters. 

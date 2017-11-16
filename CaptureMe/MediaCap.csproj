@@ -85,9 +85,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DirectX.Capture\DirectX.Capture.csproj">
+    <ProjectReference Include="..\DirectX.Capture\MediaCap.Capture.csproj">
       <Project>{8C0015DB-69E1-46E7-8705-3A4F8BE2E5E7}</Project>
-      <Name>DirectX.Capture</Name>
+      <Name>MediaCap.Capture</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

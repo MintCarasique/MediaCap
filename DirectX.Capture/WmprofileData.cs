@@ -12,7 +12,7 @@
 using System;
 using System.Diagnostics;
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	/// Summary description for WMProfileData

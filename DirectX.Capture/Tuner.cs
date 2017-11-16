@@ -30,7 +30,7 @@ using DShowNET;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 
 #if false

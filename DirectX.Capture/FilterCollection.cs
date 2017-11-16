@@ -28,7 +28,7 @@ using System.Runtime.InteropServices.ComTypes;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///	 A collection of Filter objects (DirectShow filters).

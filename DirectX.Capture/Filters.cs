@@ -21,7 +21,7 @@ using DShowNET;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  Provides collections of devices and compression codecs

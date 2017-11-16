@@ -9,7 +9,7 @@
 // ------------------------------------------------------------------
 using System;
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	using System;
 

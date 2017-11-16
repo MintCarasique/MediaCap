@@ -1,22 +1,9 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-// ------------------------------------------------------------------
-
 using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  Property pages for a DirectShow filter (e.g. hardware device). These

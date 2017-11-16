@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DShowNET;
-using DirectX.Capture;
+using MediaCap.Capture;
 
 namespace CaptureMe
 {

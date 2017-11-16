@@ -1,33 +1,13 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2009-Feb-27	HV	- created
-//  Functionality to control Color Space of video capture device
-//  - Added Brian's Low 'december 2003' code (color space, video standard)
-//  - Added code to list available color spaces
-//  - Add fix for capture devices supporting no video standard
-//  - Added additional color spaces, such as HCW2, YUV2, I420, IYUV
-//    Please report possible new values, so it can be added!
-//
-// Copyright (C) 2009 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Collections;
 using System.Windows.Forms;
-
-#if DSHOWNET
 using DShowNET;
 using DShowNET.Device;
-#else
-using DirectShowLib;
-#endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 
 	/// <summary>
@@ -103,16 +83,6 @@ namespace DirectX.Capture
 		public bool VideoDecoderAvail
 		{
 			get { return this.videoDecoder != null; }
-		}
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		public DxUtils()
-		{
-			//
-			// TODO: Add constructor logic here
-			//
 		}
 	
 		/// <summary>
@@ -190,16 +160,12 @@ namespace DirectX.Capture
 		{
 			get 
 			{
-#if SHOWNET
-				DShowNET.AnalogVideoStandard v;
-#else
 				AnalogVideoStandard v;
-#endif
 				if(this.videoDecoder != null)
 				{
 					int hr = videoDecoder.get_TVFormat(out v);
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-					return (AnalogVideoStandard)v;
+					return v;
 				}
 				else
 				{
@@ -210,11 +176,7 @@ namespace DirectX.Capture
 			{
 				if(this.videoDecoder != null)
 				{
-#if DSHOWNET
 					int hr = videoDecoder.put_TVFormat( (DShowNET.AnalogVideoStandard) value );
-#else
-					int hr = videoDecoder.put_TVFormat( (AnalogVideoStandard) value );
-#endif
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 			}
@@ -227,16 +189,12 @@ namespace DirectX.Capture
 		{
 			get
 			{
-#if SHOWNET
-				DShowNET.AnalogVideoStandard v;
-#else
 				AnalogVideoStandard v;
-#endif
 				if(this.videoDecoder != null)
 				{
 					int hr = videoDecoder.get_AvailableTVFormats(out v);
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-					return (AnalogVideoStandard)v;
+					return v;
 				}
 				else
 				{
@@ -278,28 +236,18 @@ namespace DirectX.Capture
 		{
 			ColorSpaceEnum retval = ColorSpaceEnum.RGB24;
 			bool found;
-#if DSHOWNET
 			IntPtr pmt = IntPtr.Zero;
-#endif
 			AMMediaType mediaType = new AMMediaType();
 
 			try 
 			{
 				// Get the current format info
-#if DSHOWNET
 				int hr = streamConfig.GetFormat(out pmt);
 				if (hr < 0)
 				{
 					Marshal.ThrowExceptionForHR(hr);
 				}
 				Marshal.PtrToStructure(pmt, mediaType);
-#else
-				int hr = streamConfig.GetFormat(out mediaType);
-				if (hr < 0)
-				{
-					Marshal.ThrowExceptionForHR(hr);
-				}
-#endif
 
 				// Search the Guids to find the correct enum value.
 				// Each enum value has a Guid associated with it
@@ -327,9 +275,7 @@ namespace DirectX.Capture
 			finally
 			{
 				DsUtils.FreeAMMediaType( mediaType );
-#if DSHOWNET
 				Marshal.FreeCoTaskMem( pmt );
-#endif
 			}
 
 			return retval;
@@ -342,28 +288,18 @@ namespace DirectX.Capture
 		/// <param name="newValue"></param>
 		public void setMediaSubType(IAMStreamConfig streamConfig, ColorSpaceEnum newValue)
 		{
-#if DSHOWNET
 			IntPtr pmt = IntPtr.Zero;
-#endif
 			AMMediaType mediaType = new AMMediaType();
 
 			try 
 			{
 				// Get the current format info
-#if DSHOWNET
 				int hr = streamConfig.GetFormat(out pmt);
 				if(hr < 0)
 				{
 					Marshal.ThrowExceptionForHR(hr);
 				}
 				Marshal.PtrToStructure(pmt, mediaType);
-#else
-				int hr = streamConfig.GetFormat(out mediaType);
-				if(hr < 0)
-				{
-					Marshal.ThrowExceptionForHR(hr);
-				}
-#endif
 
 				// Change the media subtype
 				// Each enum value has a Guid associated with it
@@ -381,9 +317,7 @@ namespace DirectX.Capture
 			finally
 			{
 				DsUtils.FreeAMMediaType(mediaType);
-#if DSHOWNET
 				Marshal.FreeCoTaskMem(pmt);
-#endif
 			}
 		}
 
@@ -395,28 +329,18 @@ namespace DirectX.Capture
 		/// <returns></returns>
 		public bool setMediaSubType(IAMStreamConfig streamConfig, Guid newValue)
 		{
-#if DSHOWNET
 			IntPtr pmt = IntPtr.Zero;
-#endif
 			AMMediaType mediaType = new AMMediaType();
 
 			try 
 			{
 				// Get the current format info
-#if DSHOWNET
 				int hr = streamConfig.GetFormat(out pmt);
 				if(hr < 0)
 				{
 					return false;
 				}
 				Marshal.PtrToStructure(pmt, mediaType);
-#else
-				int hr = streamConfig.GetFormat(out mediaType);
-				if(hr < 0)
-				{
-					return false;
-				}
-#endif
 
 				// Change the media subtype
 				// Each enum value has a Guid associated with it
@@ -434,9 +358,7 @@ namespace DirectX.Capture
 			finally
 			{
 				DsUtils.FreeAMMediaType(mediaType);
-#if DSHOWNET
 				Marshal.FreeCoTaskMem(pmt);
-#endif
 			}
 			return true;
 		}

@@ -1,14 +1,3 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-// 2006-March-1 HV - created
-//
-// 2008-April-8	HV - modified
-// - Added functionality to read a profile from file.
-//
-// Copyright (C) 2006, 2007, 2008 Hans Vosman
-// ------------------------------------------------------------------
 using System;
 using System.Windows.Forms;
 using System.IO;
@@ -16,13 +5,9 @@ using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections;
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	/// Summary description for AsfFormat.

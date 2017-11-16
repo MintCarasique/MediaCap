@@ -139,9 +139,6 @@
     <Compile Include="SourceCollection.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Tuner.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="VfwCompressorPropertyPage.cs">
       <SubType>Code</SubType>
     </Compile>

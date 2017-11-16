@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaCap", "CaptureMe\MediaCap.csproj", "{4B8B132F-F1BC-4AC6-BF2B-7E19FCDF29CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectX.Capture", "DirectX.Capture\DirectX.Capture.csproj", "{8C0015DB-69E1-46E7-8705-3A4F8BE2E5E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaCap.Capture", "DirectX.Capture\MediaCap.Capture.csproj", "{8C0015DB-69E1-46E7-8705-3A4F8BE2E5E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

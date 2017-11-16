@@ -17,7 +17,7 @@ using DShowNET;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  A collection of sources (or physical connectors) on an 

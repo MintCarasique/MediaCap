@@ -24,7 +24,7 @@ using DShowNET;
 using DirectShowLib;
 #endif
 
-namespace DirectX.Capture
+namespace MediaCap.Capture
 {
 	/// <summary>
 	///  A collection of available PropertyPages in a DirectShow
@@ -210,7 +210,7 @@ namespace DirectX.Capture
 			cat = PinCategory.Capture;
 			med = MediaType.Interleaved; 
 #if DSHOWNET
-			iid = typeof(DirectX.Capture.Capture.IAMTVAudio).GUID;
+			iid = typeof(MediaCap.Capture.Capture.IAMTVAudio).GUID;
 			hr = graphBuilder.FindInterface( 
 				ref cat, ref med, videoDeviceFilter, ref iid, out filter );
 #else
