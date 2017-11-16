@@ -62,15 +62,15 @@ namespace MediaCap.Capture
 		private Guid DefaultAudioProfile = WMData.WMProfile_V80_64StereoAudio;
 
 		// Default choice is use index
-		private bool useindex = true;
+		private bool _useindex = true;
 
 		/// <summary>
 		/// Index value 
 		/// </summary>
 		public bool UseIndex
 		{
-			get { return useindex; }
-			set { useindex = value; }
+			get { return _useindex; }
+			set { _useindex = value; }
 		}
 
 		/// <summary>
@@ -90,16 +90,16 @@ namespace MediaCap.Capture
 			}
 			set
 			{
-				if((value >= 0)&&(value < this.InnerList.Count))
+				if((value >= 0)&&(value < InnerList.Count))
 				{
 					CurrentProfile = this[value];
 				}
 			}
 		}
 
-		private bool FindDefaultAsfItem(AsfFormatSelection avformat)
+		private void FindDefaultAsfItem(AsfFormatSelection avformat)
 		{
-			for(int i = 0; i < this.InnerList.Count; i++)
+		    for(int i = 0; i < InnerList.Count; i++)
 			{
 				switch(avformat)
 				{
@@ -109,22 +109,19 @@ namespace MediaCap.Capture
 					case AsfFormatSelection.VideoOnly:
 						if((this[i].Guid != Guid.Empty)&&(this[i].Guid == DefaultVideoProfile))
 						{
-							CurrentProfile = this[i];
-							return true;
+						    CurrentProfile = this[i];
+						    return;
 						}
 						break;
 					case AsfFormatSelection.AudioOnly:
 						if((this[i].Guid != Guid.Empty)&&(this[i].Guid == DefaultAudioProfile))
 						{
-							CurrentProfile = this[i];
-							return true;
+						    CurrentProfile = this[i];
+						    return;
 						}
-						break;
-					default:
 						break;
 				}
 			}
-			return false;
 		}
 
 		/// <summary>
@@ -216,7 +213,7 @@ namespace MediaCap.Capture
 		/// <returns></returns>
 		public int NbrAsfItems()
 		{
-			return this.InnerList.Count;
+			return InnerList.Count;
 		}
 
 		/// <summary>
@@ -226,7 +223,7 @@ namespace MediaCap.Capture
 		/// <returns></returns>
 		public Guid GetAsfItemGuid(int item)
 		{
-			if((item >= 0)&&(item < this.InnerList.Count))
+			if((item >= 0)&&(item < InnerList.Count))
 			{
 				return this[item].Guid;
 			}
@@ -239,11 +236,10 @@ namespace MediaCap.Capture
 		/// <returns></returns>
 		public bool GetProfileFormatInfo(AsfFormatSelection avformat)
 		{
-			int hr;
-			IWMProfileManager profileManager = null;
+		    IWMProfileManager profileManager = null;
 			IWMProfile profile = null;
 
-			if(this.InnerList.Count > 0)
+			if(InnerList.Count > 0)
 			{
 				// Profile information already loaded
 				return true;
@@ -254,27 +250,26 @@ namespace MediaCap.Capture
 #endif
 			try
 			{
-				IWMProfileManager2 profileManager2 = null;
-				IWMProfileManagerLanguage profileManagerLanguage = null;
-				WMVersion wmversion = WMVersion.V4_0;
-				int nbrProfiles = 0;
+				IWMProfileManager2 profileManager2;
+				IWMProfileManagerLanguage profileManagerLanguage;
+			    int nbrProfiles;
 				int totalItems = 0;
 				short langID;
 
 				// Open the profile manager
-				hr = WMLib.WMCreateProfileManager(out profileManager);
+				var hr = WMLib.WMCreateProfileManager(out profileManager);
 				if(hr >= 0)
 				{
 					// Convert pWMProfileManager to a IWMProfileManager2
 					profileManager2 = profileManager as IWMProfileManager2;
-					profileManagerLanguage = profileManager as IWMProfileManagerLanguage;
+					profileManagerLanguage = (IWMProfileManagerLanguage) profileManager;
 
-					hr = profileManager2.GetSystemProfileVersion(out wmversion);
+					profileManager2.GetSystemProfileVersion(out var wmversion);
 #if DEBUG
 					Debug.WriteLine("WM version=" + wmversion.ToString());
 #endif
 
-					hr = profileManagerLanguage.GetUserLanguageID(out langID);
+					profileManagerLanguage.GetUserLanguageID(out langID);
 #if DEBUG
 					Debug.WriteLine("WM language ID=" + langID.ToString());
 #endif
@@ -320,7 +315,8 @@ namespace MediaCap.Capture
 					if(hr >= 0)
 					{
 						IWMProfile2 profile2 = profile as IWMProfile2;
-						hr = profile2.GetProfileID(out guid);
+					    if (profile2 != null)
+                            hr = profile2.GetProfileID(out guid);
 #if DEBUG
 						if(hr < 0)
 						{
@@ -349,12 +345,12 @@ namespace MediaCap.Capture
 				// Look for profile (*.prx) files in the current directory.
 				// If found, then add the profile(s) to the list
 				string profileData;
-				string pathProfile = System.IO.Directory.GetCurrentDirectory();
+				string pathProfile = Directory.GetCurrentDirectory();
 				string filterProfile = "*.prx";
 
 				// Obtain the file system entries in the directory path.
 				string[] directoryEntries =
-					System.IO.Directory.GetFileSystemEntries(pathProfile, filterProfile); 
+					Directory.GetFileSystemEntries(pathProfile, filterProfile); 
 
 				foreach (string filename in directoryEntries) 
 				{
@@ -547,8 +543,6 @@ namespace MediaCap.Capture
 									StoreInfo = true;
 								}
 								break;
-							default:
-								break;
 						}
 
 						if(StoreInfo)
@@ -571,7 +565,7 @@ namespace MediaCap.Capture
 								return false;
 							}
 
-							this.InnerList.Add(profileInfo);
+							InnerList.Add(profileInfo);
 							return true;
 						}
 					}
@@ -645,7 +639,7 @@ namespace MediaCap.Capture
 		/// <returns></returns>
 		public bool UpdateAsfAVFormat(IBaseFilter asfWriter)
 		{
-			return UpdateAsfAVFormat(asfWriter, this.CurrentAsfItem);
+			return UpdateAsfAVFormat(asfWriter, CurrentAsfItem);
 		}
 
 		/// <summary>
@@ -678,19 +672,19 @@ namespace MediaCap.Capture
 						}
 						else
 						{
-							this.CurrentAsfItem = asfItem;
+							CurrentAsfItem = asfItem;
 						}
 					}
 					else
 						if(this[asfItem].Filename.Length > 0)
 					{
-						if(!this.ConfigProfileFromFile(asfWriter, this[asfItem].Filename))
+						if(!ConfigProfileFromFile(asfWriter, this[asfItem].Filename))
 						{
 							MessageBox.Show("Problems with updating Windows Media audio/video format information via prx file.");
 						}
 						else
 						{
-							this.CurrentAsfItem = asfItem;
+							CurrentAsfItem = asfItem;
 						}
 					}
 				}
