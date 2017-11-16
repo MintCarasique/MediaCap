@@ -15,6 +15,8 @@ namespace CaptureMe
 
         private Filter _videoDevice;
 
+        private int _selectedVideoSource, _selectedAudioSource;
+
         private Filter _audioDevice;
 
         private Filters _filters = new Filters();
@@ -68,11 +70,12 @@ namespace CaptureMe
 
         public void SetVideoSource(int selectedIndex)
         {
+            _selectedVideoSource = selectedIndex;
         }
 
         public void SetAudioSource(int selectedIndex)
         {
-            //_capture.AudioSource = _capture.AudioSources[selectedIndex];
+            _selectedAudioSource = selectedIndex;
         }
 
         private void InitializeCapture()
@@ -82,8 +85,19 @@ namespace CaptureMe
 
         public void StartPreview(ref Panel preview)
         {
-            if(_capture != null)
+            _capture = new Capture(_filters.VideoInputDevices[_selectedVideoSource], _filters.AudioInputDevices[_selectedAudioSource], false);
+            if (_capture.PreviewWindow == null)
+            {
                 _capture.PreviewWindow = preview;
+            }
+        }
+
+        public void StopPreview()
+        {
+            if (_capture.PreviewWindow != null)
+            {
+                _capture.PreviewWindow = null;
+            }
         }
     }
 }

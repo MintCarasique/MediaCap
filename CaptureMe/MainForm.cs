@@ -57,7 +57,7 @@ namespace CaptureMe
                 }
                 else
                 {
-                    VideoPreviewPanel = null;
+                    _captureClass.StopPreview();
                     _isPreviewStarted = !_isPreviewStarted;
                 }
             }
