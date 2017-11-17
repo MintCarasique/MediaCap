@@ -422,8 +422,8 @@ namespace MediaCap.Capture
 		/// </remarks>
 		public Control PreviewWindow
 		{
-			get { return( previewWindow ); }
-			set
+			get => previewWindow;
+            set
 			{
 				assertStopped();
 				derenderGraph();
@@ -1007,7 +1007,6 @@ namespace MediaCap.Capture
 		protected SourceCollection	videoSources = null;				// Property Backer: list of physical video sources
 		protected SourceCollection	audioSources = null;				// Property Backer: list of physical audio sources
 		protected PropertyPageCollection propertyPages = null;			// Property Backer: list of property pages exposed by filters
-		//protected Tuner				tuner = null;						// Property Backer: TV Tuner
 		protected IGraphBuilder		graphBuilder;						// DShow Filter: Graph builder 
 		protected IMediaControl		mediaControl;						// DShow Filter: Start/Stop the filter graph -> copy of graphBuilder
 		protected IVideoWindow		videoWindow;						// DShow Filter: Control preview window -> copy of graphBuilder

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -98,6 +100,15 @@ namespace CaptureMe
             {
                 _capture.PreviewWindow = null;
             }
+        }
+
+        public void SaveImage(ref PictureBox snapshot)
+        {
+            Rectangle r = snapshot.RectangleToScreen(snapshot.ClientRectangle);
+            Bitmap b = new Bitmap(r.Width, r.Height);
+            Graphics g = Graphics.FromImage(b);
+            g.CopyFromScreen(r.Location, new Point(0, 0), r.Size);
+            b.Save("D:\\Documents\\5_Semester\\CourseWork\\MediaCap\\CaptureMe\\bin\\Debug\\" + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Year + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + ".jpg");
         }
     }
 }
