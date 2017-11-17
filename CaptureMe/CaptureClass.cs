@@ -83,7 +83,7 @@ namespace CaptureMe
 
         }
 
-        public void StartPreview(ref Panel preview)
+        public void StartPreview(ref PictureBox preview)
         {
             _capture = new Capture(_filters.VideoInputDevices[_selectedVideoSource], _filters.AudioInputDevices[_selectedAudioSource], false);
             if (_capture.PreviewWindow == null)

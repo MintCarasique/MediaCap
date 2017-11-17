@@ -1,4 +1,4 @@
-﻿namespace CaptureMe
+﻿namespace MediaCap
 {
     partial class MainForm
     {
@@ -28,8 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.VideoPreviewPanel = new System.Windows.Forms.Panel();
-            this.SnapshotButton = new System.Windows.Forms.Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.deviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.VideoDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AudioDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,28 +37,11 @@
             this.MainWindowMenuStrip = new System.Windows.Forms.MenuStrip();
             this.VideoDeviceCB = new System.Windows.Forms.ComboBox();
             this.AudioDeviceCB = new System.Windows.Forms.ComboBox();
+            this.PreviewCheckBox = new System.Windows.Forms.CheckBox();
+            this.PreviewPictureBox = new System.Windows.Forms.PictureBox();
             this.MainWindowMenuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PreviewPictureBox)).BeginInit();
             this.SuspendLayout();
-            // 
-            // VideoPreviewPanel
-            // 
-            this.VideoPreviewPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.VideoPreviewPanel.Location = new System.Drawing.Point(12, 27);
-            this.VideoPreviewPanel.Name = "VideoPreviewPanel";
-            this.VideoPreviewPanel.Size = new System.Drawing.Size(480, 360);
-            this.VideoPreviewPanel.TabIndex = 1;
-            // 
-            // SnapshotButton
-            // 
-            this.SnapshotButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.SnapshotButton.ForeColor = System.Drawing.Color.Red;
-            this.SnapshotButton.Location = new System.Drawing.Point(219, 393);
-            this.SnapshotButton.Name = "SnapshotButton";
-            this.SnapshotButton.Size = new System.Drawing.Size(75, 49);
-            this.SnapshotButton.TabIndex = 2;
-            this.SnapshotButton.Text = "●";
-            this.SnapshotButton.UseVisualStyleBackColor = true;
-            this.SnapshotButton.Click += new System.EventHandler(this.SnapshotButton_Click);
             // 
             // deviceToolStripMenuItem
             // 
@@ -110,44 +92,66 @@
             // 
             this.VideoDeviceCB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.VideoDeviceCB.FormattingEnabled = true;
-            this.VideoDeviceCB.Location = new System.Drawing.Point(25, 393);
+            this.VideoDeviceCB.Location = new System.Drawing.Point(12, 393);
             this.VideoDeviceCB.Name = "VideoDeviceCB";
-            this.VideoDeviceCB.Size = new System.Drawing.Size(188, 21);
+            this.VideoDeviceCB.Size = new System.Drawing.Size(201, 21);
             this.VideoDeviceCB.TabIndex = 3;
             // 
             // AudioDeviceCB
             // 
             this.AudioDeviceCB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.AudioDeviceCB.FormattingEnabled = true;
-            this.AudioDeviceCB.Location = new System.Drawing.Point(25, 421);
+            this.AudioDeviceCB.Location = new System.Drawing.Point(12, 420);
             this.AudioDeviceCB.Name = "AudioDeviceCB";
-            this.AudioDeviceCB.Size = new System.Drawing.Size(188, 21);
+            this.AudioDeviceCB.Size = new System.Drawing.Size(201, 21);
             this.AudioDeviceCB.TabIndex = 4;
+            // 
+            // PreviewCheckBox
+            // 
+            this.PreviewCheckBox.Appearance = System.Windows.Forms.Appearance.Button;
+            this.PreviewCheckBox.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.PreviewCheckBox.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("PreviewCheckBox.BackgroundImage")));
+            this.PreviewCheckBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.PreviewCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.PreviewCheckBox.Location = new System.Drawing.Point(219, 393);
+            this.PreviewCheckBox.Name = "PreviewCheckBox";
+            this.PreviewCheckBox.Size = new System.Drawing.Size(49, 48);
+            this.PreviewCheckBox.TabIndex = 5;
+            this.PreviewCheckBox.UseVisualStyleBackColor = false;
+            this.PreviewCheckBox.Click += new System.EventHandler(this.PreviewCheckBox_Click);
+            // 
+            // PreviewPictureBox
+            // 
+            this.PreviewPictureBox.Location = new System.Drawing.Point(12, 27);
+            this.PreviewPictureBox.Name = "PreviewPictureBox";
+            this.PreviewPictureBox.Size = new System.Drawing.Size(479, 360);
+            this.PreviewPictureBox.TabIndex = 6;
+            this.PreviewPictureBox.TabStop = false;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(503, 453);
+            this.Controls.Add(this.PreviewPictureBox);
+            this.Controls.Add(this.PreviewCheckBox);
             this.Controls.Add(this.AudioDeviceCB);
             this.Controls.Add(this.VideoDeviceCB);
-            this.Controls.Add(this.SnapshotButton);
-            this.Controls.Add(this.VideoPreviewPanel);
             this.Controls.Add(this.MainWindowMenuStrip);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.MainWindowMenuStrip;
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "MediaCap";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.MainWindowMenuStrip.ResumeLayout(false);
             this.MainWindowMenuStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PreviewPictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Panel VideoPreviewPanel;
-        private System.Windows.Forms.Button SnapshotButton;
         private System.Windows.Forms.ToolStripMenuItem VideoDeviceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AudioDeviceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem captureToolStripMenuItem;
@@ -156,6 +160,8 @@
         public System.Windows.Forms.ToolStripMenuItem deviceToolStripMenuItem;
         private System.Windows.Forms.ComboBox VideoDeviceCB;
         private System.Windows.Forms.ComboBox AudioDeviceCB;
+        private System.Windows.Forms.CheckBox PreviewCheckBox;
+        private System.Windows.Forms.PictureBox PreviewPictureBox;
     }
 }
 

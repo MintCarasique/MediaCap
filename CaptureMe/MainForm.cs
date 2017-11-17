@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DShowNET;
-using MediaCap.Capture;
+using CaptureMe;
 
-namespace CaptureMe
+namespace MediaCap
 {
     public partial class MainForm : Form
     {
@@ -40,11 +32,12 @@ namespace CaptureMe
             AudioDeviceCB.SelectedIndex = 0;
         }
 
-        private void SnapshotButton_Click(object sender, EventArgs e)
+        private void PreviewCheckBox_Click(object sender, EventArgs e)
         {
             if (VideoDeviceCB.SelectedIndex == 0 || AudioDeviceCB.SelectedIndex == 0)
             {
                 MessageBox.Show("Cannot activate preview. Video or audio device not choosed");
+                PreviewCheckBox.Checked = false;
             }
             else
             {
@@ -52,7 +45,7 @@ namespace CaptureMe
                 _captureClass.SetAudioSource(AudioDeviceCB.SelectedIndex - 1);
                 if (!_isPreviewStarted)
                 {
-                    _captureClass.StartPreview(ref VideoPreviewPanel);
+                    _captureClass.StartPreview(ref PreviewPictureBox);
                     _isPreviewStarted = !_isPreviewStarted;
                 }
                 else
