@@ -105,7 +105,7 @@ namespace MediaCap.Capture
 					}
 					else
 					{
-						throw new NotSupportedException( "No devices of the category " + category.ToString() );
+						throw new NotSupportedException( "No devices of the category " + category );
 					}
 				}
 //#else

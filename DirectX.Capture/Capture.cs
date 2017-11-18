@@ -1,14 +1,12 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices; 
-using System.Threading;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using DShowNET;
-
-																   
 
 namespace MediaCap.Capture
 {
@@ -261,13 +259,13 @@ namespace MediaCap.Capture
 	///  to others, post your question on the www.codeproject.com
 	///  page for DirectX.Capture.
 	/// </remarks>
-	public class Capture : ISampleGrabberCB
+	public partial class Capture : ISampleGrabberCB
     {
 
 		// ------------------ Private Enumerations --------------------
 
 		/// <summary> Possible states of the interal filter graph </summary>
-		protected enum GraphState
+		public enum GraphState
 		{
 			Null,			// No filter graph at all
 			Created,		// Filter graph created with device filters added
@@ -281,25 +279,21 @@ namespace MediaCap.Capture
 		public enum RecFileModeType
 		{
 			/// <summary> Avi video (+audio) </summary>
-			Avi,
-			/// <summary> Asf video (+audio), Wmv </summary>
-			Wmv,
-			/// <summary> Asf audio, Wma </summary>
-			Wma,
+			Avi
 		}
 
         // ------------------ Public Properties --------------------
 
 		/// <summary> Is the class currently capturing. Read-only. </summary>
-		public bool Capturing { get { return( graphState==GraphState.Capturing ); } }
+		public bool Capturing => graphState==GraphState.Capturing;
 
-		/// <summary> Has the class been cued to begin capturing. Read-only. </summary>
-		public bool Cued { get { return( isCaptureRendered && graphState==GraphState.Rendered ); } }
+        /// <summary> Has the class been cued to begin capturing. Read-only. </summary>
+		public bool Cued => isCaptureRendered && graphState==GraphState.Rendered;
 
-		/// <summary> Is the class currently stopped. Read-only. </summary>
-		public bool Stopped { get { return( graphState!=GraphState.Capturing ); } }
+        /// <summary> Is the class currently stopped. Read-only. </summary>
+		public bool Stopped => graphState != GraphState.Capturing;
 
-		/// <summary> 
+        /// <summary> 
 		///  Name of file to capture to. Initially set to
 		///  a valid temporary file.
 		/// </summary>		
@@ -320,8 +314,8 @@ namespace MediaCap.Capture
 		
 		public string Filename 
 		{ 
-			get { return( filename ); } 
-			set 
+			get => ( filename );
+            set 
 			{ 
 				assertStopped();
 				if ( Cued )
@@ -346,63 +340,20 @@ namespace MediaCap.Capture
 		/// </summary>
 		public RecFileModeType RecFileMode
 		{
-			get { return(recFileMode); }
-			set
+			get => recFileMode;
+		    set
 			{
-				if(this.graphState == GraphState.Capturing)
+				if(graphState == GraphState.Capturing)
 				{
 					// Value may not be changed now
 					return;
 				}
 
 				recFileMode = value;
-
-				// Clear previous Asf information
-				if(asfFormat != null)
-				{
-					asfFormat.Clear();
-				}
-
-				switch(recFileMode)
-				{
-					case RecFileModeType.Wma:
-						if(asfFormat == null)
-						{
-							asfFormat = new AsfFormat(AsfFormat.AsfFormatSelection.AudioOnly);
-						} 
-						else
-						{
-							asfFormat.GetProfileFormatInfo(AsfFormat.AsfFormatSelection.AudioOnly);
-						}
-						break;
-					case RecFileModeType.Wmv:
-						if(asfFormat == null)
-						{
-							asfFormat = new AsfFormat(AsfFormat.AsfFormatSelection.Video);
-						} 
-						else
-						{
-							asfFormat.GetProfileFormatInfo(AsfFormat.AsfFormatSelection.Video);
-						}
-						break;
-					case RecFileModeType.Avi:
-						break;
-					default:
-						// Unsupported file format
-						return;
-				}
-
+                
 				// Change filename extension
-				this.filename = Path.ChangeExtension(this.filename, RecFileMode.ToString().ToLower());
+				filename = Path.ChangeExtension(filename, RecFileMode.ToString().ToLower());
 			}
-		}
-
-		/// <summary>
-		/// Access to AsfFormat interface
-		/// </summary>
-		public AsfFormat AsfFormat
-		{
-			get { return asfFormat; }
 		}
         
         /// <summary>
@@ -426,11 +377,11 @@ namespace MediaCap.Capture
             set
 			{
 				assertStopped();
-				derenderGraph();
+				DerenderGraph();
 				previewWindow = value;
 				wantPreviewRendered = ( ( previewWindow != null ) && ( videoDevice != null ) );
-				renderGraph();
-				startPreviewIfNeeded();
+				RenderGraph();
+				StartPreviewIfNeeded();
 			}
 		}
 
@@ -469,10 +420,10 @@ namespace MediaCap.Capture
 						{
 							videoCaps = new VideoCapabilities( videoStreamConfig ); 
 						}
-						catch ( Exception ex ) { Debug.WriteLine( "VideoCaps: unable to create videoCaps." + ex.ToString() ); }
+						catch ( Exception ex ) { Debug.WriteLine( "VideoCaps: unable to create videoCaps." + ex ); }
 					}
 				}
-				return( videoCaps ); 
+				return videoCaps; 
 			}
 		}
 
@@ -510,10 +461,10 @@ namespace MediaCap.Capture
 						{ 
 							audioCaps = new AudioCapabilities( audioStreamConfig ); 
 						}
-						catch ( Exception ex ) { Debug.WriteLine( "AudioCaps: unable to create audioCaps." + ex.ToString() ); }
+						catch ( Exception ex ) { Debug.WriteLine( "AudioCaps: unable to create audioCaps." + ex ); }
 					}
 				}
-				return( audioCaps ); 
+				return audioCaps; 
 			} 
 		}
 
@@ -522,30 +473,30 @@ namespace MediaCap.Capture
 		///  device, dispose of the current Capture instance and create a new 
 		///  instance with the desired device. 
 		/// </summary>
-		public Filter VideoDevice { get { return( videoDevice ); } }
+		public Filter VideoDevice => videoDevice;
 
-		/// <summary> 
+        /// <summary> 
 		///  The audio capture device filter. Read-only. To use a different 
 		///  device, dispose of the current Capture instance and create a new 
 		///  instance with the desired device. 
 		/// </summary>
-		public Filter AudioDevice { get { return( audioDevice ); } }
+		public Filter AudioDevice => audioDevice;
 
-		/// <summary> 
+        /// <summary> 
 		///  The video compression filter. When this property is changed 
 		///  the internal filter graph is rebuilt. This means that some properties
 		///  will be reset. Set this property as early as possible to avoid losing 
 		///  changes. This property cannot be changed while capturing.
 		/// </summary>
 		public Filter VideoCompressor { 
-			get { return( videoCompressor ); } 
-			set 
+			get => videoCompressor;
+            set 
 			{ 
 				assertStopped();
-				destroyGraph();
+				DestroyGraph();
 				videoCompressor = value;
-				renderGraph();
-                startPreviewIfNeeded();
+				RenderGraph();
+                StartPreviewIfNeeded();
 			}
 		}
 
@@ -560,14 +511,14 @@ namespace MediaCap.Capture
 		/// </remarks>
 		public Filter AudioCompressor 
 		{ 
-			get { return( audioCompressor ); } 
-			set 
+			get => audioCompressor;
+		    set 
 			{ 
 				assertStopped();
-				destroyGraph();
+				DestroyGraph();
 				audioCompressor = value;
-				renderGraph();
-				startPreviewIfNeeded();
+				RenderGraph();
+				StartPreviewIfNeeded();
 			}
 		}
 
@@ -578,8 +529,8 @@ namespace MediaCap.Capture
 		/// </summary>
 		public Source VideoSource 
 		{ 
-			get { return( VideoSources.CurrentSource ); } 
-			set { VideoSources.CurrentSource = value; } 
+			get => VideoSources.CurrentSource;
+		    set => VideoSources.CurrentSource = value;
 		}
 
 		/// <summary> 
@@ -589,8 +540,8 @@ namespace MediaCap.Capture
 		/// </summary>
 		public Source AudioSource 
 		{
-			get { return( AudioSources.CurrentSource ); } 
-			set { AudioSources.CurrentSource = value; }
+			get => AudioSources.CurrentSource;
+		    set => AudioSources.CurrentSource = value;
 		}
 
 		/// <summary> 
@@ -627,16 +578,16 @@ namespace MediaCap.Capture
 						else
 							videoSources = new SourceCollection();
 					}
-					catch ( Exception ex ) { Debug.WriteLine( "VideoSources: unable to create VideoSources." + ex.ToString() ); }
+					catch ( Exception ex ) { Debug.WriteLine( "VideoSources: unable to create VideoSources." + ex ); }
 				}
-				return ( videoSources );
+				return videoSources;
 			}
             set
             {
                 if (value == null)
                 {
-                    this.videoSources = null;
-                    this.PropertyPages = null;
+                    videoSources = null;
+                    PropertyPages = null;
                 }
             }
 		}
@@ -688,7 +639,7 @@ namespace MediaCap.Capture
 							// that this might be a video device with audio
 							// capture via PCI bus. Than the crossbar related
 							// to the video device must be checked.
-							if((this.AudioViaPci)&&(videoDevice != null)&&(audioSources.Count == 0))
+							if((_audioViaPci)&&(videoDevice != null)&&(audioSources.Count == 0))
 							{
 								// Maybe there should be a check whether the
 								// Audio device and the video device belongs
@@ -709,7 +660,7 @@ namespace MediaCap.Capture
 							// that this might be a video device with audio
 							// capture via PCI bus. Than the crossbar related
 							// to the video device must be checked.
-							if((this.AudioViaPci)&&(videoDevice != null)/*&&(audioSources.Count == 0)*/)
+							if((_audioViaPci)&&(videoDevice != null)/*&&(audioSources.Count == 0)*/)
 							{
 								// Maybe there should be a check whether the
 								// Audio device and the video device belongs
@@ -720,7 +671,7 @@ namespace MediaCap.Capture
 							}
                         }
 					}
-					catch ( Exception ex ) { Debug.WriteLine( "AudioSources: unable to create AudioSources." + ex.ToString() ); }
+					catch ( Exception ex ) { Debug.WriteLine( "AudioSources: unable to create AudioSources." + ex ); }
 				}
 				return ( audioSources );
 			}
@@ -728,8 +679,8 @@ namespace MediaCap.Capture
             {
                 if (value == null)
                 {
-                    this.audioSources = null;
-                    this.PropertyPages = null;
+                    audioSources = null;
+                    PropertyPages = null;
                 }
             }
 		}
@@ -763,8 +714,8 @@ namespace MediaCap.Capture
 				{
 					try 
 					{
-						if( (this.AudioViaPci)&&
-							(this.audioDeviceFilter == null)&&(this.videoDeviceFilter != null) )
+						if( (_audioViaPci)&&
+							(audioDeviceFilter == null)&&(videoDeviceFilter != null) )
 						{
 							propertyPages = new PropertyPageCollection( 
 								captureGraphBuilder, 
@@ -781,7 +732,7 @@ namespace MediaCap.Capture
 							VideoSources, AudioSources );
 						}
                     }
-					catch ( Exception ex ) { Debug.WriteLine( "PropertyPages: unable to get property pages." + ex.ToString() ); }
+					catch ( Exception ex ) { Debug.WriteLine( "PropertyPages: unable to get property pages." + ex ); }
 
 				}
 				return( propertyPages );
@@ -799,12 +750,6 @@ namespace MediaCap.Capture
                 }
             }
 		}
-
-		/// <summary>
-		///  The TV Tuner or null if the current video device 
-		///  does not have a TV Tuner.
-		/// </summary>
-		//public Tuner Tuner { get { return( tuner ); } }
 	
 		/// <summary>
 		///  Gets and sets the frame rate used to capture video.
@@ -832,13 +777,13 @@ namespace MediaCap.Capture
 		{
 			get
 			{
-				long avgTimePerFrame = (long) getStreamConfigSetting( videoStreamConfig, "AvgTimePerFrame" );
+				long avgTimePerFrame = (long) GetStreamConfigSetting( videoStreamConfig, "AvgTimePerFrame" );
 				return( (double) 10000000 / avgTimePerFrame );
 			}
 			set
 			{
 				long avgTimePerFrame = (long) ( 10000000 / value );
-				setStreamConfigSetting( videoStreamConfig, "AvgTimePerFrame", avgTimePerFrame );
+				SetStreamConfigSetting( videoStreamConfig, "AvgTimePerFrame", avgTimePerFrame );
 			}
 		}
 
@@ -869,18 +814,18 @@ namespace MediaCap.Capture
 			get
 			{
 				BitmapInfoHeader bmiHeader;
-				bmiHeader = (BitmapInfoHeader) getStreamConfigSetting( videoStreamConfig, "BmiHeader" );
+				bmiHeader = (BitmapInfoHeader) GetStreamConfigSetting( videoStreamConfig, "BmiHeader" );
 				Size size = new Size( bmiHeader.Width, bmiHeader.Height );
 				return( size );
 			}
 			set
 			{
 				BitmapInfoHeader bmiHeader;
-				bmiHeader = (BitmapInfoHeader) getStreamConfigSetting( videoStreamConfig, "BmiHeader" );
+				bmiHeader = (BitmapInfoHeader) GetStreamConfigSetting( videoStreamConfig, "BmiHeader" );
 				bmiHeader.Width = value.Width;
 				bmiHeader.Height = value.Height;
-				setStreamConfigSetting( videoStreamConfig, "BmiHeader", bmiHeader );
-				this.videoCaps = null;
+				SetStreamConfigSetting( videoStreamConfig, "BmiHeader", bmiHeader );
+				videoCaps = null;
 			}		
 		}
 
@@ -906,13 +851,10 @@ namespace MediaCap.Capture
 		{
 			get
 			{
-				short audioChannels = (short) getStreamConfigSetting( audioStreamConfig, "nChannels" );
+				short audioChannels = (short) GetStreamConfigSetting( audioStreamConfig, "nChannels" );
 				return( audioChannels );
 			}
-			set
-			{
-				setStreamConfigSetting( audioStreamConfig, "nChannels", value );
-			}
+			set => SetStreamConfigSetting( audioStreamConfig, "nChannels", value );
 		}
 
 		/// <summary>
@@ -938,13 +880,10 @@ namespace MediaCap.Capture
 		{
 			get
 			{
-				int samplingRate = (int) getStreamConfigSetting( audioStreamConfig, "nSamplesPerSec" );
+				int samplingRate = (int) GetStreamConfigSetting( audioStreamConfig, "nSamplesPerSec" );
 				return( samplingRate );
 			}
-			set
-			{
-				setStreamConfigSetting( audioStreamConfig, "nSamplesPerSec", value );
-			}
+			set => SetStreamConfigSetting( audioStreamConfig, "nSamplesPerSec", value );
 		}
 
 		/// <summary>
@@ -970,80 +909,63 @@ namespace MediaCap.Capture
 		{
 			get
 			{
-				short sampleSize = (short) getStreamConfigSetting( audioStreamConfig, "wBitsPerSample" );
+				short sampleSize = (short) GetStreamConfigSetting( audioStreamConfig, "wBitsPerSample" );
 				return( sampleSize );
 			}
-			set
-			{
-				setStreamConfigSetting( audioStreamConfig, "wBitsPerSample", value );
-			}
+			set => SetStreamConfigSetting( audioStreamConfig, "wBitsPerSample", value );
 		}
-
-
-		// --------------------- Events ----------------------
-
+        
 		/// <summary> Fired when a capture is completed (manually or automatically). </summary>
 		public event EventHandler					CaptureComplete;
-
-
-
-		// ------------- Protected/private Properties --------------
-
-		protected GraphState		graphState = GraphState.Null;		// State of the internal filter graph
-		protected bool				isPreviewRendered = false;			// When graphState==Rendered, have we rendered the preview stream?
-		protected bool				isCaptureRendered = false;			// When graphState==Rendered, have we rendered the capture stream?
-		protected bool				wantPreviewRendered = false;		// Do we need the preview stream rendered (VideoDevice and PreviewWindow != null)
-		protected bool				wantCaptureRendered = false;		// Do we need the capture stream rendered
         
-		protected int				rotCookie = 0;						// Cookie into the Running Object Table
-        protected Filter			videoDevice = null;					// Property Backer: Video capture device filter
-		protected Filter			audioDevice = null;					// Property Backer: Audio capture device filter
-		protected Filter			videoCompressor = null;				// Property Backer: Video compression filter
-		protected Filter			audioCompressor = null;				// Property Backer: Audio compression filter
+		protected GraphState		graphState = GraphState.Null;		// State of the internal filter graph
+		protected bool				isPreviewRendered;			// When graphState==Rendered, have we rendered the preview stream?
+		protected bool				isCaptureRendered;			// When graphState==Rendered, have we rendered the capture stream?
+		protected bool				wantPreviewRendered;		// Do we need the preview stream rendered (VideoDevice and PreviewWindow != null)
+		protected bool				wantCaptureRendered;		// Do we need the capture stream rendered
+        
+		protected int				rotCookie;						// Cookie into the Running Object Table
+        protected Filter			videoDevice;					// Property Backer: Video capture device filter
+		protected Filter			audioDevice;					// Property Backer: Audio capture device filter
+		protected Filter			videoCompressor;				// Property Backer: Video compression filter
+		protected Filter			audioCompressor;				// Property Backer: Audio compression filter
 		protected string			filename = "";						// Property Backer: Name of file to capture to
-		protected Control			previewWindow = null;				// Property Backer: Owner control for preview
-		protected VideoCapabilities	videoCaps = null;					// Property Backer: capabilities of video device
-		protected AudioCapabilities	audioCaps = null;					// Property Backer: capabilities of audio device
-		protected SourceCollection	videoSources = null;				// Property Backer: list of physical video sources
-		protected SourceCollection	audioSources = null;				// Property Backer: list of physical audio sources
-		protected PropertyPageCollection propertyPages = null;			// Property Backer: list of property pages exposed by filters
+		protected Control			previewWindow;				// Property Backer: Owner control for preview
+		protected VideoCapabilities	videoCaps;					// Property Backer: capabilities of video device
+		protected AudioCapabilities	audioCaps;					// Property Backer: capabilities of audio device
+		protected SourceCollection	videoSources;				// Property Backer: list of physical video sources
+		protected SourceCollection	audioSources;				// Property Backer: list of physical audio sources
+		protected PropertyPageCollection propertyPages;			// Property Backer: list of property pages exposed by filters
 		protected IGraphBuilder		graphBuilder;						// DShow Filter: Graph builder 
 		protected IMediaControl		mediaControl;						// DShow Filter: Start/Stop the filter graph -> copy of graphBuilder
 		protected IVideoWindow		videoWindow;						// DShow Filter: Control preview window -> copy of graphBuilder
-		protected ICaptureGraphBuilder2		captureGraphBuilder = null;	// DShow Filter: building graphs for capturing video
-		protected IAMStreamConfig	videoStreamConfig = null;			// DShow Filter: configure frame rate, size
-		protected IAMStreamConfig	audioStreamConfig = null;			// DShow Filter: configure sample rate, sample size
-		protected IBaseFilter		videoDeviceFilter = null;			// DShow Filter: selected video device
-		protected IBaseFilter		videoCompressorFilter = null;		// DShow Filter: selected video compressor
-		protected IBaseFilter		audioDeviceFilter = null;			// DShow Filter: selected audio device
-		protected IBaseFilter		audioCompressorFilter = null;		// DShow Filter: selected audio compressor
-		protected IBaseFilter		muxFilter = null;					// DShow Filter: multiplexor (combine video and audio streams)
-		protected IFileSinkFilter	fileWriterFilter = null;			// DShow Filter: file writer
+		protected ICaptureGraphBuilder2		captureGraphBuilder;	// DShow Filter: building graphs for capturing video
+		protected IAMStreamConfig	videoStreamConfig;			// DShow Filter: configure frame rate, size
+		protected IAMStreamConfig	audioStreamConfig;			// DShow Filter: configure sample rate, sample size
+		protected IBaseFilter		videoDeviceFilter;			// DShow Filter: selected video device
+		protected IBaseFilter		videoCompressorFilter;		// DShow Filter: selected video compressor
+		protected IBaseFilter		audioDeviceFilter;			// DShow Filter: selected audio device
+		protected IBaseFilter		audioCompressorFilter;		// DShow Filter: selected audio compressor
+		protected IBaseFilter		muxFilter;					// DShow Filter: multiplexor (combine video and audio streams)
+		protected IFileSinkFilter	fileWriterFilter;			// DShow Filter: file writer
 
 		/// <summary> Recording file mode (e.g. Windows Media Audio) </summary>		 
-		protected RecFileModeType recFileMode = RecFileModeType.Wmv;
+		protected RecFileModeType recFileMode = RecFileModeType.Avi;
 
 		// Option for selection audio rendering via the pci bus of the TV card
 		// For wired audio connections the value must be false!
 		// For TV-cards, like the Hauppauge PVR150, the value must be true!
 		// This TV-card does not have a wired audio connection. However, this
 		// option will work only if the TV-card driver has an audio device!
-		private bool AudioViaPci = true;
+		private readonly bool _audioViaPci;
 
 		/// <summary>
 		/// Check if there is an Audio Device
 		/// </summary>
-		public bool AudioAvailable
-		{
-			get
-			{
-				return ( ( (this.AudioViaPci)&&(this.VideoDevice != null) )||
-				         (this.AudioDevice != null) );
-			}
-		}
+		public bool AudioAvailable =>(_audioViaPci)&&(VideoDevice != null)||(AudioDevice != null);
 
-		// Initialize AsfFormat class
-		private AsfFormat asfFormat = new AsfFormat(AsfFormat.AsfFormatSelection.Video);
+        // Initialize AsfFormat class
+		//private AsfFormat asfFormat = new AsfFormat(AsfFormat.AsfFormatSelection.Video);
 
         // ------------- Constructors/Destructors --------------
 
@@ -1060,18 +982,11 @@ namespace MediaCap.Capture
 				throw new ArgumentException( "The videoDevice and/or the audioDevice parameter must be set to a valid Filter.\n" );
 			this.videoDevice = videoDevice;
 			this.audioDevice = audioDevice;
-			this.Filename = getTempFilename();
-			this.AudioViaPci = audioViaPci;
-            createGraph();
+			Filename = GetTempFilename();
+			_audioViaPci = audioViaPci;
+            CreateGraph();
 		}
-
-		/// <summary> Destructor. Dispose of resources. </summary>
-		~Capture()
-		{
-			Dispose();
-		}
-
-
+        
 		// --------------------- Public Methods -----------------------
 
 		/// <summary>
@@ -1100,7 +1015,7 @@ namespace MediaCap.Capture
 			wantCaptureRendered = true;
 
 			// Re-render the graph (if necessary)
-			renderGraph();
+			RenderGraph();
 
 			// Pause the graph
 			int hr = mediaControl.Pause();
@@ -1116,7 +1031,7 @@ namespace MediaCap.Capture
 			wantCaptureRendered = true;
 
 			// Re-render the graph (if necessary)
-			renderGraph();
+			RenderGraph();
 
 			// Start the filter graph: begin capturing
 			int hr = mediaControl.Run();
@@ -1140,24 +1055,34 @@ namespace MediaCap.Capture
 			// we need to re-render the graph anyways because we 
 			// need to get rid of the capture stream. To re-render
 			// we need to stop the entire graph
-			if ( mediaControl != null )
-			{
-				mediaControl.Stop();
-			}
+		    mediaControl?.Stop();
 
-			// Update the state
+		    // Update the state
 			if ( graphState == GraphState.Capturing )
 			{
 				graphState = GraphState.Rendered;
-				if ( CaptureComplete != null )
-					CaptureComplete( this, null );
+			    CaptureComplete?.Invoke( this, null );
 			}
 
 			// So we destroy the capture stream IF 
 			// we need a preview stream. If we don't
 			// this will leave the graph as it is.
-			try { renderGraph(); } catch {}
-			try { startPreviewIfNeeded(); } catch {}
+		    try
+		    {
+		        RenderGraph();
+		    }
+		    catch
+		    {
+		        // ignored
+		    }
+		    try
+		    {
+		        StartPreviewIfNeeded();
+		    }
+		    catch
+		    {
+		        // ignored
+		    }
 		}
 
 		/// <summary> 
@@ -1170,12 +1095,19 @@ namespace MediaCap.Capture
 			wantCaptureRendered = false;
 			CaptureComplete = null;
 
-			try { destroyGraph(); } catch {}
+		    try
+		    {
+		        DestroyGraph();
+		    }
+		    catch
+		    {
+		        // ignored
+		    }
 
-			if ( videoSources != null )
-				videoSources.Dispose(); videoSources = null;
-			if ( audioSources != null )
-				audioSources.Dispose(); audioSources = null;
+		    videoSources?.Dispose();
+		    videoSources = null;
+		    audioSources?.Dispose();
+		    audioSources = null;
 
 		}
 
@@ -1188,284 +1120,149 @@ namespace MediaCap.Capture
 		///  misc), but leave the filters unconnected. Call renderGraph()
 		///  to connect the filters.
 		/// </summary>
-		protected void createGraph()
+		protected void CreateGraph()
 		{
-			Guid					cat;
-			Guid					med;
-			int						hr;
+			Guid cat;
+			Guid med;
+			int	hr;
 
 			// Ensure required properties are set
 			if ( videoDevice == null && audioDevice == null )
 				throw new ArgumentException( "The video and/or audio device have not been set. Please set one or both to valid capture devices.\n" );
 
 			// Skip if we are already created
-			if ( (int)graphState < (int)GraphState.Created )
-			{
-				// Garbage collect, ensure that previous filters are released
-				GC.Collect();
+		    if ((int) graphState >= (int) GraphState.Created) return;
 
-				// Make a new filter graph
-                // Make a new filter graph
-                graphBuilder = (IGraphBuilder)Activator.CreateInstance(Type.GetTypeFromCLSID(Clsid.FilterGraph, true));
+		    // Make a new filter graph
+		    graphBuilder = (IGraphBuilder)Activator.CreateInstance(Type.GetTypeFromCLSID(Clsid.FilterGraph, true));
 
-                // Get the Capture Graph Builder
-                Guid clsid = Clsid.CaptureGraphBuilder2;
-                Guid riid = typeof(ICaptureGraphBuilder2).GUID;
-                captureGraphBuilder = (ICaptureGraphBuilder2)DsBugWO.CreateDsInstance(ref clsid, ref riid);
+		    // Get the Capture Graph Builder
+		    Guid clsid = Clsid.CaptureGraphBuilder2;
+		    Guid riid = typeof(ICaptureGraphBuilder2).GUID;
+		    captureGraphBuilder = (ICaptureGraphBuilder2)DsBugWO.CreateDsInstance(ref clsid, ref riid);
 
-                // Link the CaptureGraphBuilder to the filter graph
-                hr = captureGraphBuilder.SetFiltergraph(graphBuilder);
-                if (hr < 0) Marshal.ThrowExceptionForHR(hr);
+		    // Link the CaptureGraphBuilder to the filter graph
+		    hr = captureGraphBuilder.SetFiltergraph(graphBuilder);
+		    if (hr < 0) Marshal.ThrowExceptionForHR(hr);
 
-                // Add the graph to the Running Object Table so it can be
-                // viewed with GraphEdit
+		    // Add the graph to the Running Object Table so it can be
+		    // viewed with GraphEdit
 #if DEBUG
-				DsROT.AddGraphToRot(graphBuilder, out rotCookie);
+		    DsROT.AddGraphToRot(graphBuilder, out rotCookie);
 #endif
-                // Get the video device and add it to the filter graph
-                if ( VideoDevice != null )
-				{
-					videoDeviceFilter = (IBaseFilter) Marshal.BindToMoniker( VideoDevice.MonikerString );
-					hr = graphBuilder.AddFilter( videoDeviceFilter, "Video Capture Device" );
-					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-				}
+		    // Get the video device and add it to the filter graph
+		    if ( VideoDevice != null )
+		    {
+		        videoDeviceFilter = (IBaseFilter) Marshal.BindToMoniker( VideoDevice.MonikerString );
+		        hr = graphBuilder.AddFilter( videoDeviceFilter, "Video Capture Device" );
+		        if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+		    }
 
-				// Get the audio device and add it to the filter graph
-				if ( AudioDevice != null )
-				{
-					audioDeviceFilter = (IBaseFilter) Marshal.BindToMoniker( AudioDevice.MonikerString );
-					hr = graphBuilder.AddFilter( audioDeviceFilter, "Audio Capture Device" );
-					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-				}
+		    // Get the audio device and add it to the filter graph
+		    if ( AudioDevice != null )
+		    {
+		        audioDeviceFilter = (IBaseFilter) Marshal.BindToMoniker( AudioDevice.MonikerString );
+		        hr = graphBuilder.AddFilter( audioDeviceFilter, "Audio Capture Device" );
+		        if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+		    }
 
-                // Get the video compressor and add it to the filter graph
-				if ( VideoCompressor != null )
-				{
-					videoCompressorFilter = (IBaseFilter) Marshal.BindToMoniker( VideoCompressor.MonikerString ); 
-					hr = graphBuilder.AddFilter( videoCompressorFilter, "Video Compressor" );
-					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-				}
+		    // Get the video compressor and add it to the filter graph
+		    if ( VideoCompressor != null )
+		    {
+		        videoCompressorFilter = (IBaseFilter) Marshal.BindToMoniker( VideoCompressor.MonikerString ); 
+		        hr = graphBuilder.AddFilter( videoCompressorFilter, "Video Compressor" );
+		        if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+		    }
 
-				// Get the audio compressor and add it to the filter graph
-				if ( AudioCompressor != null )
-				{
-					audioCompressorFilter = (IBaseFilter) Marshal.BindToMoniker( AudioCompressor.MonikerString ); 
-					hr = graphBuilder.AddFilter( audioCompressorFilter, "Audio Compressor" );
-					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-				}
+		    // Get the audio compressor and add it to the filter graph
+		    if ( AudioCompressor != null )
+		    {
+		        audioCompressorFilter = (IBaseFilter) Marshal.BindToMoniker( AudioCompressor.MonikerString ); 
+		        hr = graphBuilder.AddFilter( audioCompressorFilter, "Audio Compressor" );
+		        if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+		    }
 
-				// Retrieve the stream control interface for the video device
-				// FindInterface will also add any required filters
-				// (WDM devices in particular may need additional
-				// upstream filters to function).
+		    // Retrieve the stream control interface for the video device
+		    // FindInterface will also add any required filters
+		    // (WDM devices in particular may need additional
+		    // upstream filters to function).
 
-				// Try looking for an interleaved media type
-				object o;
-				cat = PinCategory.Capture;
-				med = MediaType.Interleaved;
-				Guid iid = typeof(IAMStreamConfig).GUID;
-                hr = captureGraphBuilder.FindInterface(
-                    ref cat, ref med, videoDeviceFilter, ref iid, out o);
-				if ( hr != 0 )
-				{
-					// If not found, try looking for a video media type
-					med = MediaType.Video;
-                    hr = captureGraphBuilder.FindInterface(
-                        ref cat, ref med, videoDeviceFilter, ref iid, out o);
-					if ( hr != 0 )
-						o = null;
-				}
-				videoStreamConfig = o as IAMStreamConfig;
+		    // Try looking for an interleaved media type
+		    object o;
+		    cat = PinCategory.Capture;
+		    med = MediaType.Interleaved;
+		    Guid iid = typeof(IAMStreamConfig).GUID;
+		    hr = captureGraphBuilder.FindInterface(
+		        ref cat, ref med, videoDeviceFilter, ref iid, out o);
+		    if ( hr != 0 )
+		    {
+		        // If not found, try looking for a video media type
+		        med = MediaType.Video;
+		        hr = captureGraphBuilder.FindInterface(
+		            ref cat, ref med, videoDeviceFilter, ref iid, out o);
+		        if ( hr != 0 )
+		            o = null;
+		    }
+		    videoStreamConfig = o as IAMStreamConfig;
                 
-				o = null;
-				cat = PinCategory.Preview;
-				med = MediaType.Interleaved;
-				iid = typeof(IAMStreamConfig).GUID;
-				hr = captureGraphBuilder.FindInterface(
-					ref cat, ref med, videoDeviceFilter, ref iid, out o);
+		    o = null;
+		    cat = PinCategory.Preview;
+		    med = MediaType.Interleaved;
+		    iid = typeof(IAMStreamConfig).GUID;
+		    hr = captureGraphBuilder.FindInterface(
+		        ref cat, ref med, videoDeviceFilter, ref iid, out o);
 
-				if ( hr != 0 )
-				{
-					// If not found, try looking for a video media type
-					med = MediaType.Video;
-					hr = captureGraphBuilder.FindInterface(
-						ref cat, ref med, videoDeviceFilter, ref iid, out o);
-					if ( hr != 0 )
-						o = null;
-				}
-				this.previewStreamConfig = o as IAMStreamConfig;
-				// End of new Brian's Low code
+		    if ( hr != 0 )
+		    {
+		        // If not found, try looking for a video media type
+		        med = MediaType.Video;
+		        hr = captureGraphBuilder.FindInterface(
+		            ref cat, ref med, videoDeviceFilter, ref iid, out o);
+		        if ( hr != 0 )
+		            o = null;
+		    }
+		    previewStreamConfig = o as IAMStreamConfig;
+		    o = null;
+		    cat = PinCategory.Capture;
+		    med = MediaType.Audio ;
+		    iid = typeof(IAMStreamConfig).GUID;
+		    if( (_audioViaPci)&&
+		        (audioDeviceFilter == null)&&(videoDeviceFilter != null) )
+		    {
+		        hr = captureGraphBuilder.FindInterface(ref cat, ref med, videoDeviceFilter, ref iid, out o );
+		    }
+		    else
+		    {
+		        hr = captureGraphBuilder.FindInterface(ref cat, ref med, audioDeviceFilter, ref iid, out o);
+		    }
 
-				if( (this.videoStreamConfig != null)||
-					(this.previewStreamConfig != null) )
-				{
-					this.dxUtils = new DxUtils();
-					bool result = this.dxUtils.InitDxUtils(this.videoDeviceFilter);
+		    if (hr != 0)
+		        o = null;
+		    audioStreamConfig = o as IAMStreamConfig;
 
-					if((!result)&&(!this.dxUtils.FindMediaData(this.videoStreamConfig)))
-					{
-						this.dxUtils.Dispose();
-						this.dxUtils = null;
-					}
-				}
-				o = null;
-				cat = PinCategory.Capture;
-				med = MediaType.Audio ;
-				iid = typeof(IAMStreamConfig).GUID;
-				if( (this.AudioViaPci)&&
-					(audioDeviceFilter == null)&&(videoDeviceFilter != null) )
-				{
-                    hr = captureGraphBuilder.FindInterface(ref cat, ref med, videoDeviceFilter, ref iid, out o );
-				}
-				else
-				{
-                    hr = captureGraphBuilder.FindInterface(ref cat, ref med, audioDeviceFilter, ref iid, out o);
-				}
+		    // Retreive the media control interface (for starting/stopping graph)
+		    mediaControl = graphBuilder as IMediaControl;
 
-				if (hr != 0)
-					o = null;
-				audioStreamConfig = o as IAMStreamConfig;
+		    // Reload any video crossbars
+		    videoSources?.Dispose();
+		    videoSources = null;
 
-				// Retreive the media control interface (for starting/stopping graph)
-				mediaControl = (IMediaControl) graphBuilder;
-
-				// Reload any video crossbars
-				if ( videoSources != null ) videoSources.Dispose(); videoSources = null;
-
-				// Reload any audio crossbars
-				if ( audioSources != null ) audioSources.Dispose(); audioSources = null;
+		    // Reload any audio crossbars
+		    audioSources?.Dispose();
+		    audioSources = null;
 				
-				// Reload any property pages exposed by filters
-                this.PropertyPages = null;
+		    // Reload any property pages exposed by filters
+		    PropertyPages = null;
 
-				// Reload capabilities of video device
-				videoCaps = null;
-				previewCaps = null;
+		    // Reload capabilities of video device
+		    videoCaps = null;
+		    previewCaps = null;
 
-				// Reload capabilities of video device
-				audioCaps = null;
+		    // Reload capabilities of video device
+		    audioCaps = null;
 
-//				// Retrieve TV Tuner if available
-//				o = null;
-//				cat = PinCategory.Capture;
-//				med = MediaType.Interleaved; 
-//				iid = typeof(IAMTVTuner).GUID;
-//#if DSHOWNET
-//                hr = captureGraphBuilder.FindInterface(
-//                    ref cat, ref med, videoDeviceFilter, ref iid, out o);
-//#else
 
-//				hr = captureGraphBuilder.FindInterface( 
-//					DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-//#endif
-//				if ( hr != 0 )
-//				{
-//					med = MediaType.Video ;
-//#if DSHOWNET
-//                    hr = captureGraphBuilder.FindInterface(
-//                        ref cat, ref med, videoDeviceFilter, ref iid, out o);
-//#else
-//					hr = captureGraphBuilder.FindInterface( 
-//						DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, DsGuid.FromGuid(iid), out o );
-//#endif
-//					if ( hr != 0 )
-//						o = null;
-//				}
-//				IAMTVTuner t = o as IAMTVTuner;
-//				if ( t != null )
-//				{
-//					tuner = new Tuner(t);
-//					// Do not forget to set proper country code (Netherlands is 31)
-//				}
-
-//				// No check on TV Audio needed, it will show up in the
-//				// PropertyPages when it is available
-//				// Code for finding the TV audio interface
-//				o = null;
-//				cat = PinCategory.Capture;
-//				med = MediaType.Interleaved;
-//				iid = typeof(IAMTVAudio).GUID;
-//				hr = captureGraphBuilder.FindInterface(
-//#if DSHOWNET
-//					ref cat, ref med, videoDeviceFilter, ref iid, out o);
-//#else
-//                    cat, med, videoDeviceFilter, iid, out o);
-//#endif
-//				if ( hr != 0 )
-//				{
-//					med = MediaType.Video;
-//#if DSHOWNET
-//					hr = captureGraphBuilder.FindInterface(
-//						ref cat, ref med, videoDeviceFilter, ref iid, out o);
-//#else
-//				hr = captureGraphBuilder.FindInterface(
-//					cat, med, videoDeviceFilter, iid, out o);
-//#endif
-//					if ( hr != 0 )
-//					{
-//						o = null;
-//					}
-//				}
-
-//				if((o != null)&&(tuner != null))
-//				{
-//					IAMTVAudio a = o as IAMTVAudio;
-//					TvAudio = a;
-//#if DEBUG
-//					Debug.WriteLine("FindInterface tuner.TvAudio");
-//#endif // DEBUG
-//				}
-
-				/*
-							// ----------- VMR 9 -------------------
-							//## check out samples\inc\vmrutil.h :: RenderFileToVMR9
-
-							IBaseFilter vmr = null;
-							if ( ( VideoDevice != null ) && ( previewWindow != null ) )
-							{
-								vmr = (IBaseFilter) Activator.CreateInstance( Type.GetTypeFromCLSID( Clsid.VideoMixingRenderer9, true ) ); 
-								hr = graphBuilder.AddFilter( vmr, "VMR" );
-								if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-
-								IVMRFilterConfig9 vmrFilterConfig = (IVMRFilterConfig9) vmr;
-								hr = vmrFilterConfig.SetRenderingMode( VMRMode9.Windowless );
-								if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-
-								IVMRWindowlessControl9 vmrWindowsless = (IVMRWindowlessControl9) vmr;	
-								hr = vmrWindowsless.SetVideoClippingWindow( previewWindow.Handle );
-								if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-							}
-							//------------------------------------------- 
-
-							// ---------- SmartTee ---------------------
-
-							IBaseFilter smartTeeFilter = (IBaseFilter) Activator.CreateInstance( Type.GetTypeFromCLSID( Clsid.SmartTee, true ) ); 
-							hr = graphBuilder.AddFilter( smartTeeFilter, "Video Smart Tee" );
-							if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-
-							// Video -> SmartTee
-							cat = PinCategory.Capture;
-							med = MediaType.Video;
-							hr = captureGraphBuilder.RenderStream( DsGuid.FromGuid(cat), DsGuid.FromGuid(med), videoDeviceFilter, null, smartTeeFilter ); 
-							if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-
-							// smarttee -> mux
-							cat = PinCategory.Capture;
-							med = MediaType.Video;
-							hr = captureGraphBuilder.RenderStream( DsGuid.FromGuid(cat), DsGuid.FromGuid(med), smartTeeFilter, null, muxFilter ); 
-							if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-
-							// smarttee -> vmr
-							cat = PinCategory.Preview;
-							med = MediaType.Video;
-							hr = captureGraphBuilder.RenderStream( DsGuid.FromGuid(cat), DsGuid.FromGuid(med), smartTeeFilter, null, vmr ); 
-							if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-
-							// -------------------------------------
-				*/		
-				// Update the state now that we are done
-				graphState = GraphState.Created;
-			}
+		    graphState = GraphState.Created;
 		}
 
 		/// <summary>
@@ -1474,7 +1271,7 @@ namespace MediaCap.Capture
 		///  is ready to be used. This method may also destroy
 		///  streams if we have streams we no longer want.
 		/// </summary>
-		protected void renderGraph()
+		protected void RenderGraph()
 		{
 			Guid					cat;
 			Guid					med;
@@ -1491,11 +1288,10 @@ namespace MediaCap.Capture
 				throw new ArgumentException( "The Filename property has not been set to a file.\n" );
 
 			// Stop the graph
-			if ( mediaControl != null )
-				mediaControl.Stop();
+		    mediaControl?.Stop();
 
-			// Create the graph if needed (group should already be created)
-			createGraph();
+		    // Create the graph if needed (group should already be created)
+			CreateGraph();
 
 			// Derender the graph if we have a capture or preview stream
 			// that we no longer want. We can't derender the capture and 
@@ -1505,56 +1301,31 @@ namespace MediaCap.Capture
 			// not using the preview to Stop() and Start() without
 			// rerendering the graph.
 			if ( !wantPreviewRendered && isPreviewRendered )
-				derenderGraph();
+				DerenderGraph();
 			if ( !wantCaptureRendered && isCaptureRendered )
 				if ( wantPreviewRendered )
-					derenderGraph();
+					DerenderGraph();
 
 
 			// Render capture stream (only if necessary)
 			if ( wantCaptureRendered && !isCaptureRendered )
 			{
 				// Render the file writer portion of graph (mux -> file)
-				// Record captured audio/video in Avi, Wmv or Wma format
+				// Record captured audio/video in Avi format
 				Guid mediaSubType; // Media sub type
 				bool captureAudio = true;
 				bool captureVideo = true;
 				IBaseFilter videoCompressorfilter = null;
 
 				// Set media sub type and video compressor filter if needed
-				if(RecFileMode == RecFileModeType.Avi)
-				{
 					mediaSubType = MediaSubType.Avi;
 					// For Avi file saving a video compressor must be used
 					// If one is selected, that one will be used.
 					videoCompressorfilter = videoCompressorFilter;
-				}
-				else
-				{
-					mediaSubType = MediaSubType.Asf;
-				}
 
 				// Intialize the Avi or Asf file writer
                 hr = captureGraphBuilder.SetOutputFileName(ref mediaSubType, Filename, out muxFilter, out fileWriterFilter);
 				if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
-
-				// For Wma (and Wmv) a suitable profile must be selected. This
-				// can be done via a property window, however the muxFilter is
-				// just created. if needed, the property windows should show up
-				// right now!
-				// Another solution is to configure the Asf file writer, the
-				// use interface must ensure the proper format has been
-				// selected.
-				if((RecFileMode == RecFileModeType.Wma)||
-					(RecFileMode == RecFileModeType.Wmv))
-				{
-					if(this.AsfFormat != null)
-					{
-						this.AsfFormat.UpdateAsfAVFormat(this.muxFilter);
-						this.AsfFormat.GetCurrentAsfAVInfo(out captureAudio, out captureVideo);
-					}
-				}
-
 				// Render video (video -> mux) if needed or possible
 				if((VideoDevice != null)&&(captureVideo))
                 {
@@ -1585,7 +1356,7 @@ namespace MediaCap.Capture
 					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 				else
-					if( (this.AudioViaPci)&&(captureAudio)&&
+					if( (_audioViaPci)&&(captureAudio)&&
 					(audioDeviceFilter == null)&&(videoDeviceFilter != null) )
 				{
 					cat = PinCategory.Capture;
@@ -1602,29 +1373,29 @@ namespace MediaCap.Capture
 			if ( wantPreviewRendered && !isPreviewRendered )
 			{
 				// Render preview (video -> renderer)
-				this.InitVideoRenderer();
-				this.AddDeInterlaceFilter();
+				InitVideoRenderer();
+				//this.AddDeInterlaceFilter();
 
 				// When capture pin is used, preview works immediately,
 				// however this conflicts with file saving.
 				// An alternative is to use VMR9
                 cat = PinCategory.Preview;
 				med = MediaType.Video;
-				if(this.InitSampleGrabber())
+				if(InitSampleGrabber())
 				{
 					Debug.WriteLine("SampleGrabber added to graph.");
                     
-					hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, this.baseGrabFlt, this.videoRendererFilter);
+					hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, _baseGrabFlt, _videoRendererFilter);
 					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 				else
 				{
-					hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, null, this.videoRendererFilter);
+					hr = captureGraphBuilder.RenderStream(ref cat, ref med, videoDeviceFilter, null, _videoRendererFilter);
 					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 
 				// Special option to enable rendering audio via PCI bus
-				if((this.AudioViaPci)&&(audioDeviceFilter != null))
+				if((_audioViaPci)&&(audioDeviceFilter != null))
 				{
 					cat = PinCategory.Preview;
 					med = MediaType.Audio;
@@ -1635,8 +1406,8 @@ namespace MediaCap.Capture
 					}
 				}
 				else
-					if( (this.AudioViaPci)&&
-					(this.audioDeviceFilter == null)&&(this.videoDeviceFilter != null) )
+					if( (_audioViaPci)&&
+					(audioDeviceFilter == null)&&(videoDeviceFilter != null) )
 				{
 					cat = PinCategory.Preview;
 					med = MediaType.Audio;
@@ -1648,7 +1419,7 @@ namespace MediaCap.Capture
 				}
 
 				// Get the IVideoWindow interface
-				videoWindow = (IVideoWindow) graphBuilder;
+				videoWindow = graphBuilder as IVideoWindow;
 
 				// Set the video window to be a child of the main window
 				hr = videoWindow.put_Owner( previewWindow.Handle );
@@ -1659,8 +1430,8 @@ namespace MediaCap.Capture
 				if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 				// Position video window in client rect of owner window
-				previewWindow.Resize += new EventHandler( onPreviewWindowResize );
-				onPreviewWindowResize( this, null );
+				previewWindow.Resize += OnPreviewWindowResize;
+				OnPreviewWindowResize( this, null );
 
 				// Make the video window visible, now that it is properly positioned
 				hr = videoWindow.put_Visible( DsHlp.OATRUE );
@@ -1679,7 +1450,7 @@ namespace MediaCap.Capture
 		///  Setup and start the preview window if the user has
 		///  requested it (by setting PreviewWindow).
 		/// </summary>
-		protected void startPreviewIfNeeded()
+		protected void StartPreviewIfNeeded()
 		{
 			// Render preview 
 			if ( wantPreviewRendered && isPreviewRendered && !isCaptureRendered )
@@ -1694,7 +1465,7 @@ namespace MediaCap.Capture
 					int hr = mediaControl.Run();
 					if(hr != 0)
 					{
-						Debug.WriteLine("MediaControl.Run() returns: " + hr.ToString());
+						Debug.WriteLine("MediaControl.Run() returns: " + hr);
 					}
 				}
 				catch
@@ -1714,7 +1485,7 @@ namespace MediaCap.Capture
 		///  can only be set when the device output pins are not
 		///  connected. 
 		/// </summary>
-		protected void derenderGraph()
+		protected void DerenderGraph()
 		{
 			// Stop the graph if it is running (ignore errors)
 			if ( mediaControl != null )
@@ -1730,7 +1501,7 @@ namespace MediaCap.Capture
 
 			// Remove the Resize event handler
 			if ( PreviewWindow != null )
-				previewWindow.Resize -= new EventHandler( onPreviewWindowResize );
+				previewWindow.Resize -= OnPreviewWindowResize;
 
 			if ( (int)graphState >= (int)GraphState.Rendered )
 			{
@@ -1746,7 +1517,7 @@ namespace MediaCap.Capture
 				{
 					try
 					{
-						removeDownstream(videoDeviceFilter, (videoCompressor == null));
+						RemoveDownstream(videoDeviceFilter, (videoCompressor == null));
 					}
 					catch
 					{
@@ -1757,7 +1528,7 @@ namespace MediaCap.Capture
 				{
 					try
 					{
-						removeDownstream(audioDeviceFilter, (audioCompressor == null));
+						RemoveDownstream(audioDeviceFilter, (audioCompressor == null));
 					}
 					catch
 					{
@@ -1769,8 +1540,7 @@ namespace MediaCap.Capture
 				// calls above. (Is there anyway to check?)
 				muxFilter = null;
 				fileWriterFilter = null;
-				this.videoRendererFilter = null;
-				this.deInterlaceFilter = null;
+				_videoRendererFilter = null;
             }
 		}
 
@@ -1781,7 +1551,7 @@ namespace MediaCap.Capture
 		///  "removeFirstFilter" is used to keep a compressor (that should
 		///  be immediately downstream of the device) if one is begin used.
 		/// </summary>
-		protected void removeDownstream( IBaseFilter filter, bool removeFirstFilter )
+		protected void RemoveDownstream( IBaseFilter filter, bool removeFirstFilter )
 		{
 			// Get a pin enumerator off the filter
 			IEnumPins pinEnum;
@@ -1809,7 +1579,7 @@ namespace MediaCap.Capture
 							if( (hr == 0) && (info.dir == (PinDirection.Input)) )
 							{
 								// Recurse down this branch
-								removeDownstream( info.filter, true );
+								RemoveDownstream( info.filter, true );
 
 								// Disconnect 
 								graphBuilder.Disconnect( pinTo );
@@ -1837,15 +1607,22 @@ namespace MediaCap.Capture
 		///  Completely tear down a filter graph and 
 		///  release all associated resources.
 		/// </summary>
-		protected void destroyGraph()
+		protected void DestroyGraph()
 		{
 			// Derender the graph (This will stop the graph
 			// and release preview window. It also destroys
 			// half of the graph which is unnecessary but
 			// harmless here.) (ignore errors)
-			try{ derenderGraph(); } catch {}
+		    try
+		    {
+		        DerenderGraph();
+		    }
+		    catch
+		    {
+		        // ignored
+		    }
 
-			// Update the state after derender because it
+		    // Update the state after derender because it
 			// depends on correct status. But we also want to
 			// update the state as early as possible in case
 			// of error.
@@ -1877,27 +1654,17 @@ namespace MediaCap.Capture
 			if ( audioDeviceFilter != null )
 				graphBuilder.RemoveFilter( audioDeviceFilter );
 
-			if(this.videoRendererFilter != null)
+			if(_videoRendererFilter != null)
 			{
-				this.graphBuilder.RemoveFilter(this.videoRendererFilter);
+				graphBuilder.RemoveFilter(_videoRendererFilter);
 			}
 
             // Clean up properties
-			if ( videoSources != null )
-				videoSources.Dispose(); videoSources = null;
-			if ( audioSources != null )
-				audioSources.Dispose(); audioSources = null;
-            this.PropertyPages = null; // Disposal done within PropertyPages
-			if(this.tvAudio != null)
-			{
-				Marshal.ReleaseComObject(this.tvAudio); tvAudio = null;
-			}
-
-			if(this.dxUtils != null)
-			{
-				this.dxUtils.Dispose();
-				this.dxUtils = null;
-			}
+		    videoSources?.Dispose();
+		    videoSources = null;
+		    audioSources?.Dispose();
+		    audioSources = null;
+            PropertyPages = null; // Disposal done within PropertyPages
 
 			// Cleanup
 			if ( graphBuilder != null )
@@ -1916,54 +1683,54 @@ namespace MediaCap.Capture
 				Marshal.ReleaseComObject( videoCompressorFilter ); videoCompressorFilter = null;
 			if ( audioCompressorFilter != null )
 				Marshal.ReleaseComObject( audioCompressorFilter ); audioCompressorFilter = null;
-			this.DisposeSampleGrabber();
+			DisposeSampleGrabber();
 
-			if(this.videoRendererFilter != null)
+			if(_videoRendererFilter != null)
 			{
-				Marshal.ReleaseComObject(this.videoRendererFilter); this.videoRendererFilter = null;
+				Marshal.ReleaseComObject(_videoRendererFilter); _videoRendererFilter = null;
 			}
 
             // These are copies of graphBuilder
 			mediaControl = null;
 			videoWindow = null;
-
-			// For unmanaged objects we haven't released explicitly
-			GC.Collect();
-		}
+        }
 
 		/// <summary> Resize the preview when the PreviewWindow is resized </summary>
-		protected void onPreviewWindowResize(object sender, EventArgs e)
+		protected void OnPreviewWindowResize(object sender, EventArgs e)
 		{
-			if ( videoWindow != null )
-			{
-				// Position video window in client rect of owner window
-				Rectangle rc = previewWindow.ClientRectangle;
-				videoWindow.SetWindowPosition( 0, 0, rc.Right, rc.Bottom );
-			}
+		    if (videoWindow == null) return;
+		    // Position video window in client rect of owner window
+		    Rectangle rc = previewWindow.ClientRectangle;
+		    videoWindow.SetWindowPosition( 0, 0, rc.Right, rc.Bottom );
 		}
 	
 		/// <summary> 
 		///  Get a valid temporary filename (with path). We aren't using 
 		///  Path.GetTempFileName() because it creates a 0-byte file 
 		/// </summary>
-		protected string getTempFilename()
+		protected string GetTempFilename()
 		{
 			string s;
-			try
-			{
-				int count = 0;
-				int i;
-				Random r = new Random();
-				string tempPath = Path.GetTempPath();
-				do
-				{
-					i = r.Next();
-					s = Path.Combine( tempPath, i.ToString("X") + ".avi" );
-					count++;
-					if ( count > 100 ) throw new InvalidOperationException( "Unable to find temporary file." );
-				} while ( File.Exists( s ) );
-			}
-			catch { s = "c:\temp.avi"; }
+		    try
+		    {
+		        int count = 0;
+		        int i;
+		        Random r = new Random();
+		        string tempPath = Path.GetTempPath();
+		        do
+		        {
+		            i = r.Next();
+		            s = Path.Combine(tempPath, i.ToString("X") + ".avi");
+		            count++;
+		            if (count > 100)
+                        throw new InvalidOperationException("Unable to find temporary file.");
+		        }
+                while (File.Exists(s));
+		    }
+		    catch
+		    {
+		        s = "c:\temp.avi";
+		    }
 			return( s );
 		}
 
@@ -1976,13 +1743,13 @@ namespace MediaCap.Capture
 		///  This format block structure may be one of several 
 		///  types, the type being determined by AMMediaType.formatType.
 		/// </summary>
-		protected object getStreamConfigSetting( IAMStreamConfig streamConfig, string fieldName)
+		protected object GetStreamConfigSetting( IAMStreamConfig streamConfig, string fieldName)
 		{
 			if ( streamConfig == null )
 				throw new NotSupportedException();
 			assertStopped();
 
-			derenderGraph();
+			DerenderGraph();
 
 			object returnValue = null;
 			IntPtr pmt = IntPtr.Zero;
@@ -2026,8 +1793,8 @@ namespace MediaCap.Capture
 				DsUtils.FreeAMMediaType( mediaType );
 				Marshal.FreeCoTaskMem( pmt );
 			}
-			renderGraph();
-			startPreviewIfNeeded();
+			RenderGraph();
+			StartPreviewIfNeeded();
 
 			return( returnValue );
 		}
@@ -2041,12 +1808,12 @@ namespace MediaCap.Capture
 		///  This format block structure may be one of several 
 		///  types, the type being determined by AMMediaType.formatType.
 		/// </summary>
-		protected object setStreamConfigSetting( IAMStreamConfig streamConfig, string fieldName, object newValue)
+		protected object SetStreamConfigSetting( IAMStreamConfig streamConfig, string fieldName, object newValue)
 		{
 			if ( streamConfig == null )
 				throw new NotSupportedException();
 			assertStopped();
-			derenderGraph();
+			DerenderGraph();
 
 			object returnValue = null;
             IntPtr pmt = IntPtr.Zero;
@@ -2105,8 +1872,8 @@ namespace MediaCap.Capture
 				DsUtils.FreeAMMediaType( mediaType );
                 Marshal.FreeCoTaskMem(pmt);
             }
-			renderGraph();
-			startPreviewIfNeeded();
+			RenderGraph();
+			StartPreviewIfNeeded();
 
 			return( returnValue );
 		}
@@ -2117,14 +1884,16 @@ namespace MediaCap.Capture
 		protected void assertStopped()
 		{
 			if ( !Stopped )
-				throw new InvalidOperationException( "This operation not allowed while Capturing. Please Stop the current capture." ); 
-		}
+            {
+                throw new InvalidOperationException( "This operation not allowed while Capturing. Please Stop the current capture." );
+            }
+        }
         
 		/// <summary>
 		/// CLSID_VideoRenderer
 		/// </summary>
 		[ComImport, Guid("70e102b0-5556-11ce-97c0-00aa0055595a")]
-			public class VideoRenderer
+		public class VideoRenderer
 		{
 
 		}
@@ -2132,177 +1901,40 @@ namespace MediaCap.Capture
 		/// <summary>
 		/// Use VMR9 flag, if false use the video renderer instead
 		/// </summary>
-		private bool useVMR9 = false;
+		private bool _useVmr9;
 
-		private IBaseFilter videoRendererFilter = null;
+		private IBaseFilter _videoRendererFilter;
 
 		/// <summary>
 		/// Check if VMR9 should be used
 		/// </summary>
 		public bool UseVMR9
 		{
-			get { return this.useVMR9; }
-			set	{ this.useVMR9 = value; }
+			get => _useVmr9;
+		    set => _useVmr9 = value;
 		}
 
 		private bool InitVideoRenderer()
 		{
-			if(this.videoRendererFilter != null)
+			if(_videoRendererFilter != null)
 			{
-				this.graphBuilder.RemoveFilter(this.videoRendererFilter);
-				Marshal.ReleaseComObject(this.videoRendererFilter);
-				this.videoRendererFilter = null;
+				graphBuilder.RemoveFilter(_videoRendererFilter);
+				Marshal.ReleaseComObject(_videoRendererFilter);
+				_videoRendererFilter = null;
 			}
 
-			if(this.useVMR9)
+			if(_useVmr9)
 			{
-				this.videoRendererFilter = (IBaseFilter)new VideoMixingRenderer9();
+				_videoRendererFilter = new VideoMixingRenderer9() as IBaseFilter;
 			}
 			else
 			{
-				this.videoRendererFilter = (IBaseFilter)new VideoRenderer();
+				_videoRendererFilter = new VideoRenderer() as IBaseFilter;
 			}
 
-			if(this.videoRendererFilter != null)
+			if(_videoRendererFilter != null)
 			{
-				this.graphBuilder.AddFilter(this.videoRendererFilter, "Video Renderer");
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// IAMTVAudio property
-		/// </summary>
-		protected IAMTVAudio tvAudio = null;
-
-		/// <summary>
-		/// Access to TV audio property
-		/// </summary>
-		public IAMTVAudio TvAudio
-		{
-			get { return tvAudio; }
-			set
-			{
-				tvAudio = value;
-			}
-		}
-        
-		/// <summary>
-		/// From AMTVAudioEventType
-		/// </summary>
-		[Flags]
-			public enum AMTVAudioEventType
-		{
-			/// <summary> TV Audio changed event </summary>
-			Changed = 0x0001
-		}
-
-		/// <summary>
-		/// IAMTVAudio interface
-		/// </summary>
-		[Guid("83EC1C30-23D1-11d1-99E6-00A0C9560266"),
-			InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-			public interface IAMTVAudio
-		{
-			/// <summary> </summary>
-			[PreserveSig]
-			int GetHardwareSupportedTVAudioModes([Out] out TVAudioMode plModes);
-
-			/// <summary> </summary>
-			[PreserveSig]
-			int GetAvailableTVAudioModes([Out] out TVAudioMode plModes);
-
-			/// <summary> </summary>
-			[PreserveSig]
-			int get_TVAudioMode([Out] out TVAudioMode plMode);
-
-			/// <summary> </summary>
-			[PreserveSig]
-			int put_TVAudioMode([In] TVAudioMode lMode);
-
-			/// <summary> </summary>
-			[PreserveSig]
-			int RegisterNotificationCallBack(
-				[In] IAMTunerNotification pNotify,
-				[In] AMTVAudioEventType lEvents
-				);
-
-			/// <summary> </summary>
-			[PreserveSig]
-			int UnRegisterNotificationCallBack([In] IAMTunerNotification pNotify);
-		}
-
-		/// <summary>
-		/// From TVAudioMode
-		/// </summary>
-		[Flags]
-			public enum TVAudioMode
-		{
-			/// <summary> Mono </summary>
-			Mono = 0x0001,
-			/// <summary> Stereo </summary>
-			Stereo = 0x0002,
-			/// <summary> Language A </summary>
-			LangA = 0x0010,
-			/// <summary> Language B </summary>
-			LangB = 0x0020,
-			/// <summary> Language C </summary>
-			LangC = 0x0040,
-		}
-
-		private Filter deInterlace = null;
-		private IBaseFilter deInterlaceFilter = null;
-
-		/// <summary>
-		/// Store De-Interlace filter reference, is used upon adding
-		/// de-interlace filter to graph
-		/// </summary>
-		public Filter DeInterlace
-		{
-			get { return this.deInterlace; }
-			set
-			{
-				if(value == null)
-				{
-					if (this.deInterlaceFilter != null)
-					{
-						this.graphBuilder.RemoveFilter(this.deInterlaceFilter);
-						Marshal.ReleaseComObject(this.deInterlaceFilter);
-						this.deInterlaceFilter = null;
-					}
-
-					if (this.deInterlace != null)
-					{
-						try
-						{
-							//Marshal.ReleaseComObject(this.deInterlace);
-						}
-						catch
-						{
-							this.DeInterlace = null;
-						};
-					}
-				}
-				this.deInterlace = value;
-			}
-		}
-
-		private bool AddDeInterlaceFilter()
-		{
-			if(this.DeInterlace != null)
-			{
-				if(this.deInterlaceFilter != null)
-				{
-					this.graphBuilder.RemoveFilter(this.deInterlaceFilter);
-					Marshal.ReleaseComObject(this.deInterlaceFilter);
-					this.deInterlaceFilter = null;
-				}
-				this.deInterlaceFilter = (IBaseFilter) Marshal.BindToMoniker(this.DeInterlace.MonikerString);
-				int hr = this.graphBuilder.AddFilter(this.deInterlaceFilter, "De-Interlace filter");
-				if(hr >= 0)
-				{
-					return true;
-				}
+				graphBuilder.AddFilter(_videoRendererFilter, "Video Renderer");
 			}
 			return false;
 		}
@@ -2317,26 +1949,26 @@ namespace MediaCap.Capture
 		/// <summary>
 		/// SampleGrabber flag, if false do not insert SampleGrabber in graph
 		/// </summary>
-		private bool allowSampleGrabber = false;
+		private bool _allowSampleGrabber;
 
 		/// <summary> grabber filter interface. </summary>
-		private IBaseFilter baseGrabFlt = null;
+		private IBaseFilter _baseGrabFlt;
 
 		/// <summary>
 		/// Sample Grabber interface
 		/// </summary>
-		protected ISampleGrabber sampGrabber = null;
+		protected ISampleGrabber SampGrabber;
 
 		/// <summary>
 		/// Check if usage SampleGrabber is allowed
 		/// </summary>
 		public bool AllowSampleGrabber
 		{
-			get { return allowSampleGrabber; }
-			set { allowSampleGrabber = value; }
+			get => _allowSampleGrabber;
+		    set => _allowSampleGrabber = value;
 		}
 
-		int ISampleGrabberCB.SampleCB( double SampleTime, IMediaSample pSample )
+		int ISampleGrabberCB.SampleCB( double sampleTime, IMediaSample pSample )
 		{
 			Trace.Write ("Sample");
 			return 0;
@@ -2347,42 +1979,39 @@ namespace MediaCap.Capture
 		/// </summary>
 		public void DisableEvent()
 		{
-			if(this.sampGrabber != null)
-			{
-				this.sampGrabber.SetCallback(null, 0);
-			}
+		    SampGrabber?.SetCallback(null, 0);
 		}
 
 		/// <summary> Interface frame event </summary>
-		public delegate void HeFrame(System.Drawing.Bitmap BM);
+		public delegate void HeFrame(Bitmap BM);
 		private delegate void CaptureDone();
 		/// <summary> Frame event </summary>
 		public event HeFrame FrameEvent2;
-		private	byte[] savedArray;
-		private	int	bufferedSize;
-		private bool frameCaptured = true;
+		private	byte[] _savedArray;
+		private	int	_bufferedSize;
+		private bool _frameCaptured = true;
 
 		int ISampleGrabberCB.BufferCB(double SampleTime, IntPtr pBuffer, int BufferLen )
 		{
-			if(frameCaptured)
+			if(_frameCaptured)
 			{
 				return 0;
 			}
-			this.frameCaptured = true;
-			this.bufferedSize = BufferLen;
+			_frameCaptured = true;
+			_bufferedSize = BufferLen;
 			
-			int stride = this.SnapShotWidth * 3;
+			int stride = SnapShotWidth * 3;
 
-			Marshal.Copy( pBuffer, this.savedArray, 0, BufferLen );
+			Marshal.Copy( pBuffer, _savedArray, 0, BufferLen );
 
-			GCHandle handle = GCHandle.Alloc( this.savedArray, GCHandleType.Pinned );
+			GCHandle handle = GCHandle.Alloc( _savedArray, GCHandleType.Pinned );
 			int scan0 = (int) handle.AddrOfPinnedObject();
-			scan0 += (this.SnapShotHeight - 1) * stride;
-			Bitmap b = new Bitmap(this.SnapShotWidth, this.SnapShotHeight, -stride, System.Drawing.Imaging.PixelFormat.Format24bppRgb, (IntPtr) scan0 );
+			scan0 += (SnapShotHeight - 1) * stride;
+			Bitmap b = new Bitmap(SnapShotWidth, SnapShotHeight, -stride, PixelFormat.Format24bppRgb, (IntPtr) scan0 );
 			handle.Free();
 
 			// Transfer bitmap upon firing event
-			this.FrameEvent2(b);
+			FrameEvent2(b);
 			return 0;
 		}
 
@@ -2391,78 +2020,80 @@ namespace MediaCap.Capture
 		{
 			Trace.Write ("IMG");
 
-			if( this.savedArray == null )
+			if( _savedArray == null )
 			{
-				int size = this.snapShotImageSize;
+				int size = snapShotImageSize;
 				if( (size < 1000) || (size > 16000000) )
 					return;
-				this.savedArray = new byte[ size + 64000 ];
+				_savedArray = new byte[ size + 64000 ];
 			}
-			this.sampGrabber.SetCallback( this, 1 );
-			this.frameCaptured = false;
+			SampGrabber.SetCallback( this, 1 );
+			_frameCaptured = false;
 		}
 
 		private bool InitSampleGrabber()
 		{
-			if (this.VideoDevice == null)
+			if (VideoDevice == null)
 			{
 				// nothing to do
 				return false;
 			}
 
-			if (!this.allowSampleGrabber)
+			if (!_allowSampleGrabber)
 			{
 				return false;
 			}
 
-			this.DisposeSampleGrabber();
+			DisposeSampleGrabber();
 
 			int hr  = 0;
 
 			// Get SampleGrabber if needed
-			if(this.sampGrabber == null)
+			if(SampGrabber == null)
 			{
-				this.sampGrabber = new SampleGrabber() as ISampleGrabber;
+				SampGrabber = new SampleGrabber() as ISampleGrabber;
 			}
 
-			if(this.sampGrabber == null)
+			if(SampGrabber == null)
 			{
 				return false;
 			}
             
-			this.baseGrabFlt	= (IBaseFilter)this.sampGrabber;
+			_baseGrabFlt	= (IBaseFilter) SampGrabber;
 
-			if(this.baseGrabFlt == null)
+			if(_baseGrabFlt == null)
 			{
-				Marshal.ReleaseComObject(this.sampGrabber);
-				this.sampGrabber = null;
+				Marshal.ReleaseComObject(SampGrabber);
+				SampGrabber = null;
 			}
 
-			AMMediaType media = new AMMediaType();
+		    AMMediaType media = new AMMediaType
+		    {
+		        majorType = MediaType.Video,
+		        subType = MediaSubType.RGB24,
+		        formatPtr = IntPtr.Zero
+		    };
 
-			media.majorType	= MediaType.Video;
-			media.subType	= MediaSubType.RGB24;
-			media.formatPtr = IntPtr.Zero;
-			hr = sampGrabber.SetMediaType(media);
+		    hr = SampGrabber.SetMediaType(media);
 			if(hr < 0)
 			{
 				Marshal.ThrowExceptionForHR(hr);
 			}
 
-			hr = graphBuilder.AddFilter(baseGrabFlt, "SampleGrabber");
+			hr = graphBuilder.AddFilter(_baseGrabFlt, "SampleGrabber");
 			if(hr < 0)
 			{
 				Marshal.ThrowExceptionForHR(hr);
 			}
 
-			hr = sampGrabber.SetBufferSamples(false);
+			hr = SampGrabber.SetBufferSamples(false);
 			if( hr == 0 )
 			{
-				hr = sampGrabber.SetOneShot(false);
+				hr = SampGrabber.SetOneShot(false);
 			}
 			if( hr == 0 )
 			{
-				hr = sampGrabber.SetCallback(null, 0);
+				hr = SampGrabber.SetCallback(null, 0);
 			}
 			if( hr < 0 )
 			{
@@ -2474,14 +2105,14 @@ namespace MediaCap.Capture
 
 		private void SetMediaSampleGrabber()
 		{
-			this.snapShotValid = false;
-			if((this.baseGrabFlt != null)&&(this.AllowSampleGrabber))
+			snapShotValid = false;
+			if((_baseGrabFlt != null)&&(AllowSampleGrabber))
 			{
 				AMMediaType media = new AMMediaType();
 				VideoInfoHeader videoInfoHeader;
 				int hr;
 
-				hr = sampGrabber.GetConnectedMediaType(media);
+				hr = SampGrabber.GetConnectedMediaType(media);
 				if (hr < 0)
 				{
 					Marshal.ThrowExceptionForHR(hr);
@@ -2492,70 +2123,64 @@ namespace MediaCap.Capture
 				}
 
 				videoInfoHeader = (VideoInfoHeader)Marshal.PtrToStructure(media.formatPtr, typeof(VideoInfoHeader));
-				this.snapShotWidth = videoInfoHeader.BmiHeader.Width;
-				this.snapShotHeight = videoInfoHeader.BmiHeader.Height;
-				this.snapShotImageSize = videoInfoHeader.BmiHeader.ImageSize;
+				snapShotWidth = videoInfoHeader.BmiHeader.Width;
+				snapShotHeight = videoInfoHeader.BmiHeader.Height;
+				snapShotImageSize = videoInfoHeader.BmiHeader.ImageSize;
 				Marshal.FreeCoTaskMem(media.formatPtr);
 				media.formatPtr = IntPtr.Zero;
-				this.snapShotValid = true;
+				snapShotValid = true;
 			}
 
-			if (!this.snapShotValid)
+			if (!snapShotValid)
 			{
-				this.snapShotWidth = 0;
-				this.snapShotHeight = 0;
-				this.snapShotImageSize = 0;
+				snapShotWidth = 0;
+				snapShotHeight = 0;
+				snapShotImageSize = 0;
 			}
 		}
 
-		private int snapShotWidth = 0;
-		private int snapShotHeight = 0;
-		private int snapShotImageSize = 0;
-		private bool snapShotValid = false;
+		private int snapShotWidth;
+		private int snapShotHeight;
+		private int snapShotImageSize;
+		private bool snapShotValid;
 
 		/// <summary>
 		/// Dispose Sample Grabber specific data
 		/// </summary>
 		public void DisposeSampleGrabber()
 		{
-			if(this.baseGrabFlt != null)
+			if(_baseGrabFlt != null)
 			{
 				try
 				{
-					this.graphBuilder.RemoveFilter(this.baseGrabFlt);
+					graphBuilder.RemoveFilter(_baseGrabFlt);
 				}
 				catch
 				{
 				}
-				Marshal.ReleaseComObject(this.baseGrabFlt);
-				this.baseGrabFlt = null;
+				Marshal.ReleaseComObject(_baseGrabFlt);
+				_baseGrabFlt = null;
 			}
 
-			if(this.sampGrabber != null)
+			if(SampGrabber != null)
 			{
-				Marshal.ReleaseComObject(this.sampGrabber);
-				this.sampGrabber = null;
+				Marshal.ReleaseComObject(SampGrabber);
+				SampGrabber = null;
 			}
-			this.savedArray =  null;
+			_savedArray =  null;
 		}
 
 		/// <summary>
 		/// SampleGrabber video width
 		/// </summary>
-		public int SnapShotWidth
-		{
-			get { return snapShotWidth; }
-		}
+		public int SnapShotWidth => snapShotWidth;
 
-		/// <summary>
+        /// <summary>
 		/// SampleGrabber video height
 		/// </summary>
-		public int SnapShotHeight
-		{
-			get { return snapShotHeight; }
-		}
+		public int SnapShotHeight => snapShotHeight;
 
-		/// <summary>
+        /// <summary>
 		/// Show property page of object 
 		/// </summary>
 		/// <param name="filter"></param>
@@ -2565,35 +2190,20 @@ namespace MediaCap.Capture
 		{
 			ISpecifyPropertyPages specifyPropertyPages =  null;
 			String propertyPageName = "";
-			switch(filter)
-			{
-				case 1:
-					if(this.videoRendererFilter != null)
-					{
-						specifyPropertyPages = this.videoRendererFilter as ISpecifyPropertyPages;
-						propertyPageName = "Video Renderer";
-					}
-					break;
-				case 2:
-					if(this.deInterlaceFilter != null)
-					{
-						specifyPropertyPages = this.deInterlaceFilter as ISpecifyPropertyPages;
-						propertyPageName = "De-Interlacer";
-					}
-					break;
-				default:
-					break;
-			}
-			DirectShowPropertyPage PropertyPage = new DirectShowPropertyPage(propertyPageName, specifyPropertyPages);
-			if(PropertyPage != null)
-			{
-				PropertyPage.Show(o);
-				PropertyPage.Dispose();
-				return true;
-			}
-			return false;
+		    if (filter == 1)
+		    {
+		        if (_videoRendererFilter != null)
+		        {
+		            specifyPropertyPages = _videoRendererFilter as ISpecifyPropertyPages;
+		            propertyPageName = "Video Renderer";
+		        }
+		    }
+		    DirectShowPropertyPage propertyPage = new DirectShowPropertyPage(propertyPageName, specifyPropertyPages);
+		    if (propertyPage == null) return false;
+		    propertyPage.Show(o);
+		    propertyPage.Dispose();
+		    return true;
 		}
-// Start of Brian's Low new code
 
 		/// <summary>
 		/// IAMStreamConfig interface of preview pin. It is not really
@@ -2601,174 +2211,12 @@ namespace MediaCap.Capture
 		/// such interface it can be used "independent" from the capture
 		/// pin interface.
 		/// </summary>
-		protected IAMStreamConfig	previewStreamConfig = null;	
+		protected IAMStreamConfig	previewStreamConfig;	
 
 		/// <summary>
 		/// Property Backer: preview capabilities of video device
 		/// </summary>
-		protected VideoCapabilities	previewCaps = null;
-
-		/// <summary>
-		/// Interface to DirectShow utilities for controlling video
-		/// </summary>
-		public DxUtils dxUtils = null;
-
-		/// <summary>
-		///  Gets and sets the frame size used to preview video.
-		/// </summary>
-		/// <remarks>
-		///  To change the frame size, assign a new Size object 
-		///  to this property <code>capture.Size = new Size( w, h );</code>
-		///  rather than modifying the size in place 
-		///  (capture.Size.Width = w;). Not all frame
-		///  rates are supported.
-		///  
-		/// <para>
-		///  Not all devices support getting/setting this property.
-		///  If this property is not supported, accessing it will
-		///  throw and exception. </para>
-		/// 
-		///  <para>
-		///  The frame size used to capture video can be different
-		///  than the frame size used in preview.</para>
-		///
-		/// <para> 
-		///  This property cannot be changed while capturing. Changing 
-		///  this property while preview is enabled will cause some 
-		///  fickering while the internal filter graph is partially
-		///  rebuilt. Changing this property while cued will cancel the
-		///  cue. Call Cue() again to re-cue the capture. </para>
-		/// </remarks>
-		public Size PreviewFrameSize
-		{
-			get
-			{
-				BitmapInfoHeader bmiHeader;
-				bmiHeader = (BitmapInfoHeader) getStreamConfigSetting( previewStreamConfig, "BmiHeader" );
-				Size size = new Size( bmiHeader.Width, bmiHeader.Height );
-				return( size );
-			}
-			set
-			{
-				BitmapInfoHeader bmiHeader;
-				bmiHeader = (BitmapInfoHeader) getStreamConfigSetting( previewStreamConfig, "BmiHeader" );
-				bmiHeader.Width = value.Width;
-				bmiHeader.Height = value.Height;
-				setStreamConfigSetting( previewStreamConfig, "BmiHeader", bmiHeader );
-			}		
-		}
-
-		/// <summary>
-		///  Gets and sets the color space (and pixel format) used for capture.
-		/// </summary>
-		/// <remarks>
-		///  Retrieving this propert will temporarily stop the preview. 
-		///  This property cannot be changed while capturing or cued. 
-		/// </remarks> 
-		public DxUtils.ColorSpaceEnum ColorSpace
-		{
-			get { return getMediaSubType( videoStreamConfig ); }
-			set { setMediaSubType( videoStreamConfig, value ); }
-		}
-
-		/// <summary>
-		///  Gets and sets the color space (and pixel format) used for preview.
-		/// </summary>
-		/// <remarks>
-		///  Retrieving this propert will temporarily stop the preview. 
-		///  This property cannot be changed while capturing or cued. 
-		/// </remarks> 
-		public DxUtils.ColorSpaceEnum PreviewColorSpace
-		{
-			get { return getMediaSubType( previewStreamConfig ); }
-			set { setMediaSubType( previewStreamConfig, value ); }
-		}
-
-		private DxUtils.ColorSpaceEnum getMediaSubType( IAMStreamConfig streamConfig )
-		{
-			if(this.dxUtils == null)
-			{
-				return DxUtils.ColorSpaceEnum.RGB24;
-			}
-
-			// Derender the graph. For some drivers these settings
-			// cannot be read while the graph is built
-			if ( streamConfig == null )
-			{
-				throw new NotSupportedException();
-			}
-			assertStopped();
-			derenderGraph();
-
-			DxUtils.ColorSpaceEnum retval = dxUtils.getMediaSubType(streamConfig);
-
-			renderGraph();
-			startPreviewIfNeeded();
-
-			return retval;
-		}
-
-		private void setMediaSubType( IAMStreamConfig streamConfig, DxUtils.ColorSpaceEnum newValue )
-		{
-			if(this.dxUtils == null)
-			{
-				return;
-			}
-
-			if(videoStreamConfig == null)
-			{
-				throw new NotSupportedException();
-			}
-			assertStopped();
-			derenderGraph();
-
-			dxUtils.setMediaSubType(streamConfig, newValue);
-
-			renderGraph();
-			startPreviewIfNeeded();
-		}
-
-		/// <summary>
-		///  The preview capabilities of the video device.
-		/// </summary>
-		/// <remarks>
-		///  It may be required to cue the capture (see <see cref="Cue"/>) 
-		///  before all capabilities are correctly reported. If you 
-		///  have such a device, the developer would be interested to
-		///  hear from you.
-		/// 
-		/// <para>
-		///  The information contained in this property is retrieved and
-		///  cached the first time this property is accessed. Future
-		///  calls to this property use the cached results. This was done 
-		///  for performance. </para>
-		///  
-		/// <para>
-		///  However, this means <b>you may get different results depending 
-		///  on when you access this property first</b>. If you are experiencing 
-		///  problems, try accessing the property immediately after creating 
-		///  the Capture class or immediately after setting the video and 
-		///  audio compressors. Also, inform the developer. </para>
-		/// </remarks>
-		public VideoCapabilities PreviewCaps 
-		{ 
-			get 
-			{ 
-				if ( previewCaps == null )
-				{
-					if ( previewStreamConfig != null )
-					{
-						try 
-						{ 
-							previewCaps = new VideoCapabilities( previewStreamConfig ); 
-						}
-						catch ( Exception ex ) { Debug.WriteLine( "VideoCaps: unable to create previewCaps." + ex.ToString() ); }
-					}
-				}
-				return( previewCaps ); 
-			} 
-		}
-// End of Brian's Low new code
+		protected VideoCapabilities	previewCaps;
 	}
 }
 

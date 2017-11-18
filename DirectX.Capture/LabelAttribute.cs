@@ -7,13 +7,12 @@
 //
 // Copyright (C) 2009 Hans Vosman
 // ------------------------------------------------------------------
+
 using System;
 
 namespace MediaCap.Capture
 {
-	using System;
-
-	[AttributeUsage(AttributeTargets.All)]
+    [AttributeUsage(AttributeTargets.All)]
 	public class LabelAttribute : Attribute
 	{
 		public readonly string Label;

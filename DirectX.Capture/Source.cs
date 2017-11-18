@@ -8,9 +8,8 @@
 // ------------------------------------------------------------------
 
 using System;
-using System.Runtime.InteropServices;
 #if DSHOWNET
-using DShowNET;
+
 #else
 using DirectShowLib;
 #endif

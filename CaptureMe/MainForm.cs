@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Windows.Forms;
 using CaptureMe;
 
@@ -10,7 +8,7 @@ namespace MediaCap
     {
         private CaptureClass _captureClass;
 
-        private bool _isPreviewStarted = false;
+        private bool _isPreviewStarted;
 
         public MainForm()
         {
@@ -61,6 +59,11 @@ namespace MediaCap
         private void SnapshotButton_Click(object sender, EventArgs e)
         {
             _captureClass.SaveImage(ref PreviewPictureBox);
+        }
+
+        private void TestButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

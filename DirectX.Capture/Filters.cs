@@ -14,7 +14,6 @@
 // Copyright (C) 2007 Hans Vosman
 // ------------------------------------------------------------------
 
-using System;
 #if DSHOWNET
 using DShowNET;
 #else

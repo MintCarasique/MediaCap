@@ -1,10 +1,10 @@
 using System;
-using System.Windows.Forms;
-using System.IO;
-using System.Text;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Collections;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Forms;
 using DShowNET;
 
 namespace MediaCap.Capture
@@ -50,7 +50,7 @@ namespace MediaCap.Capture
 			/// <summary> Audio only asf formats </summary>
 			AudioOnly,
 			/// <summary> All Asf formats with at least video </summary>
-			Video,
+			Video
 		}
 
 		private const WMVersion DefaultWMversion = WMVersion.V8_0;
@@ -129,14 +129,11 @@ namespace MediaCap.Capture
 		/// </summary>
 		private Guid GetCurrentAsfItem()
 		{
-			if(CurrentProfile != null)
+		    if(CurrentProfile != null)
 			{
 				return CurrentProfile.Guid;
 			}
-			else
-			{
-				return Guid.Empty;
-			}
+		    return Guid.Empty;
 		}
 
 		/// <summary>
@@ -152,15 +149,14 @@ namespace MediaCap.Capture
 
 			if(CurrentProfile != null)
 			{
-				if(CurrentProfile.Guid != Guid.Empty)
+			    if(CurrentProfile.Guid != Guid.Empty)
 				{
 					return GetAsfAVInfo(CurrentProfile.Guid, out captureAudio, out captureVideo);
 				}
-				else
-					if((CurrentProfile.Filename != null)&&(CurrentProfile.Filename.Length > 0))
-				{
-					return GetAsfAVInfo(CurrentProfile.Filename, out captureAudio, out captureVideo);
-				}
+			    if((CurrentProfile.Filename != null)&&(CurrentProfile.Filename.Length > 0))
+			    {
+			        return GetAsfAVInfo(CurrentProfile.Filename, out captureAudio, out captureVideo);
+			    }
 			}
 			return false;
 		}
@@ -246,7 +242,7 @@ namespace MediaCap.Capture
 			}
 
 #if DEBUG
-			Debug.WriteLine("Look for Windows Media profile information: " + avformat.ToString());
+			Debug.WriteLine("Look for Windows Media profile information: " + avformat);
 #endif
 			try
 			{
@@ -266,12 +262,12 @@ namespace MediaCap.Capture
 
 					profileManager2.GetSystemProfileVersion(out var wmversion);
 #if DEBUG
-					Debug.WriteLine("WM version=" + wmversion.ToString());
+					Debug.WriteLine("WM version=" + wmversion);
 #endif
 
 					profileManagerLanguage.GetUserLanguageID(out langID);
 #if DEBUG
-					Debug.WriteLine("WM language ID=" + langID.ToString());
+					Debug.WriteLine("WM language ID=" + langID);
 #endif
 
 					//IWMProfileManagerLanguage
@@ -288,7 +284,7 @@ namespace MediaCap.Capture
 							return false;
 						}
 #if DEBUG
-						Debug.WriteLine("ProfileCount=" + nbrProfiles.ToString());
+						Debug.WriteLine("ProfileCount=" + nbrProfiles);
 #endif
 					} 
 					else
@@ -320,14 +316,14 @@ namespace MediaCap.Capture
 #if DEBUG
 						if(hr < 0)
 						{
-							Debug.WriteLine("GetProfileID failed for item " + p.ToString());
+							Debug.WriteLine("GetProfileID failed for item " + p);
 						}
 #endif
 					}
 #if DEBUG
 					else
 					{
-						Debug.WriteLine("LoadSystemProfile failed for item " + p.ToString());
+						Debug.WriteLine("LoadSystemProfile failed for item " + p);
 					}
 #endif
 					if(hr >= 0)
@@ -670,10 +666,7 @@ namespace MediaCap.Capture
 							MessageBox.Show("Problems with updating Windows Media audio/video format information via Guid.");
 							return false;
 						}
-						else
-						{
-							CurrentAsfItem = asfItem;
-						}
+					    CurrentAsfItem = asfItem;
 					}
 					else
 						if(this[asfItem].Filename.Length > 0)
@@ -692,7 +685,7 @@ namespace MediaCap.Capture
 				// Set other (more general) settings, if needed
 
 				// Set index
-				hr = lConfig.SetIndexMode(this.UseIndex);
+				hr = lConfig.SetIndexMode(UseIndex);
 				if(hr < 0)
 				{
 					MessageBox.Show("Problems with updating Windows Media index information.");

@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using DShowNET;
+
 namespace MediaCap.Capture
 {
 	/// <summary>

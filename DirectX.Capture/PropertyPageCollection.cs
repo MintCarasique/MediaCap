@@ -15,8 +15,8 @@
 // ------------------------------------------------------------------
 
 using System;
-using System.Diagnostics;
 using System.Collections;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 #if DSHOWNET
 using DShowNET;
@@ -183,56 +183,56 @@ namespace MediaCap.Capture
 			addIfSupported( videoCompressorFilter, "Video Compressor" );
 
 			// 6. the video TV tuner
-			cat = PinCategory.Capture;
-			med = MediaType.Interleaved; 
-			iid = typeof(IAMTVTuner).GUID;
-#if DSHOWNET 
-			hr = graphBuilder.FindInterface(
-				ref cat, ref med, videoDeviceFilter, ref iid, out filter );
-#else
-            hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
-#endif
-			if ( hr != 0 )
-			{
-				med = MediaType.Video ;
-#if DSHOWNET
-				hr = graphBuilder.FindInterface( 
-					ref cat, ref med, videoDeviceFilter, ref iid, out filter );
-#else
-            hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
-#endif
-				if ( hr != 0 )
-					filter = null;
-			}
-			addIfSupported( filter, "TV Tuner" );
-
-//#if NEWCODE
-			cat = PinCategory.Capture;
-			med = MediaType.Interleaved; 
-#if DSHOWNET
-			iid = typeof(MediaCap.Capture.Capture.IAMTVAudio).GUID;
-			hr = graphBuilder.FindInterface( 
-				ref cat, ref med, videoDeviceFilter, ref iid, out filter );
-#else
-			iid = typeof(IAMTVAudio).GUID;
-			hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
-#endif
-			if ( hr != 0 )
-			{
-				med = MediaType.Video ;
-#if DSHOWNET
-				hr = graphBuilder.FindInterface( 
-					ref cat, ref med, videoDeviceFilter, ref iid, out filter );
-#else
-                hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
-#endif
-				if ( hr != 0 )
-				{
-					filter = null;
-				}
-			}
-			addIfSupported( filter, "TV Audio" );
+//			cat = PinCategory.Capture;
+//			med = MediaType.Interleaved; 
+//			iid = typeof(IAMTVTuner).GUID;
+//#if DSHOWNET 
+//			hr = graphBuilder.FindInterface(
+//				ref cat, ref med, videoDeviceFilter, ref iid, out filter );
+//#else
+//            hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
 //#endif
+//			if ( hr != 0 )
+//			{
+//				med = MediaType.Video ;
+//#if DSHOWNET
+//				hr = graphBuilder.FindInterface( 
+//					ref cat, ref med, videoDeviceFilter, ref iid, out filter );
+//#else
+//            hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
+//#endif
+//				if ( hr != 0 )
+//					filter = null;
+//			}
+//			addIfSupported( filter, "TV Tuner" );
+
+////#if NEWCODE
+//			cat = PinCategory.Capture;
+//			med = MediaType.Interleaved; 
+//#if DSHOWNET
+//			iid = typeof(MediaCap.Capture.Capture.IAMTVAudio).GUID;
+//			hr = graphBuilder.FindInterface( 
+//				ref cat, ref med, videoDeviceFilter, ref iid, out filter );
+//#else
+//			iid = typeof(IAMTVAudio).GUID;
+//			hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
+//#endif
+//			if ( hr != 0 )
+//			{
+//				med = MediaType.Video ;
+//#if DSHOWNET
+//				hr = graphBuilder.FindInterface( 
+//					ref cat, ref med, videoDeviceFilter, ref iid, out filter );
+//#else
+//                hr = graphBuilder.FindInterface(cat, med, videoDeviceFilter, iid, out filter);
+//#endif
+//				if ( hr != 0 )
+//				{
+//					filter = null;
+//				}
+//			}
+//			addIfSupported( filter, "TV Audio" );
+////#endif
 
 			// 7. the video compressor (VFW)
 			IAMVfwCompressDialogs compressDialog = videoCompressorFilter as IAMVfwCompressDialogs;

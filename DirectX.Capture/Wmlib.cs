@@ -18,11 +18,12 @@
 // is currently available ... Because I could not find an official and
 // good quality library, this one is used.
 // ------------------------------------------------------------------
+
 using System;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 #if DSHOWNET
-using DShowNET;
+
 #else
 using DirectShowLib;
 #endif

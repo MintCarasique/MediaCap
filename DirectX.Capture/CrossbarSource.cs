@@ -1,5 +1,4 @@
-using System;
-using System.Runtime.InteropServices; 
+using System.Runtime.InteropServices;
 using DShowNET;
 
 namespace MediaCap.Capture
@@ -41,13 +40,13 @@ namespace MediaCap.Capture
 				if ( value )
 				{
 					// Enable this route
-					int hr = this.Crossbar.Route( this.OutputPin, this.InputPin );
+					int hr = Crossbar.Route( OutputPin, InputPin );
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 					// Enable the related pin as well
 					if ( RelatedInputSource != null )
 					{
-						hr = this.Crossbar.Route( RelatedInputSource.OutputPin, RelatedInputSource.InputPin );  
+						hr = Crossbar.Route( RelatedInputSource.OutputPin, RelatedInputSource.InputPin );  
 						if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 					}
@@ -56,13 +55,13 @@ namespace MediaCap.Capture
 				{
 					// Disable this route by routing the output
 					// pin to input pin -1
-					int hr = this.Crossbar.Route( this.OutputPin, -1 );
+					int hr = Crossbar.Route( OutputPin, -1 );
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 					// Disable the related pin as well
 					if ( RelatedInputSource != null )
 					{
-						hr = this.Crossbar.Route( RelatedInputSource.OutputPin, -1 );  
+						hr = Crossbar.Route( RelatedInputSource.OutputPin, -1 );  
 						if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 
 					}
@@ -77,22 +76,22 @@ namespace MediaCap.Capture
 		/// <summary> Constructor. This class cannot be created directly. </summary>
 		internal CrossbarSource( IAMCrossbar crossbar, int outputPin, int inputPin, PhysicalConnectorType connectorType )
 		{
-			this.Crossbar = crossbar;
-			this.OutputPin = outputPin;
-			this.InputPin = inputPin;
-			this.ConnectorType = connectorType;
-			this.name = getName( connectorType );
+			Crossbar = crossbar;
+			OutputPin = outputPin;
+			InputPin = inputPin;
+			ConnectorType = connectorType;
+			name = getName( connectorType );
 		}
 
 		/// <summary> Constructor. This class cannot be created directly. </summary>
 		internal CrossbarSource( IAMCrossbar crossbar, int outputPin, int inputPin, int relatedInputPin, PhysicalConnectorType connectorType )
 		{
-			this.Crossbar = crossbar;
-			this.OutputPin = outputPin;
-			this.InputPin = inputPin;
-			this.RelatedInputPin = relatedInputPin; 
-			this.ConnectorType = connectorType;
-			this.name = getName( connectorType );
+			Crossbar = crossbar;
+			OutputPin = outputPin;
+			InputPin = inputPin;
+			RelatedInputPin = relatedInputPin; 
+			ConnectorType = connectorType;
+			name = getName( connectorType );
 		}
 
 		// --------------------------- Private methods ----------------------------
@@ -133,19 +132,5 @@ namespace MediaCap.Capture
 			}
 			return( name );
 		}
-
-
-		
-		// -------------------- IDisposable -----------------------
-
-		/// <summary> Release unmanaged resources. </summary>
-		public override void Dispose()
-		{
-			if ( Crossbar != null )
-				Marshal.ReleaseComObject( Crossbar );
-			Crossbar = null;
-			RelatedInputSource = null;
-			base.Dispose();
-		}	
 	}
 }

@@ -1,11 +1,9 @@
 using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Reflection;
 using System.Collections;
-using System.Windows.Forms;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using DShowNET;
-using DShowNET.Device;
 
 namespace MediaCap.Capture
 {
@@ -68,21 +66,21 @@ namespace MediaCap.Capture
 			/// <summary>
 			/// YUY2 (packed 4:2:2), Pinnacle 330eV
 			/// </summary>
-			[Label("32595559-0000-0010-8000-00AA00389B71")]		YUY2,		
+			[Label("32595559-0000-0010-8000-00AA00389B71")]		YUY2		
 		}
 
 		/// <summary> Video Decoder </summary>
-		protected IAMAnalogVideoDecoder videoDecoder = null;
+		protected IAMAnalogVideoDecoder videoDecoder;
 
 		/// <summary> Array List </summary>
-		protected ArrayList subTypeList = null;
+		protected ArrayList subTypeList;
 
 		/// <summary>
 		/// Check if the Video Decoder interface is available
 		/// </summary>
 		public bool VideoDecoderAvail
 		{
-			get { return this.videoDecoder != null; }
+			get { return videoDecoder != null; }
 		}
 	
 		/// <summary>
@@ -90,11 +88,11 @@ namespace MediaCap.Capture
 		/// </summary>
 		public void Dispose()
 		{
-			this.videoDecoder = null;
-			if(this.subTypeList != null)
+			videoDecoder = null;
+			if(subTypeList != null)
 			{
-				this.subTypeList.Clear();
-				this.subTypeList = null;
+				subTypeList.Clear();
+				subTypeList = null;
 			}
 		}
 
@@ -145,7 +143,7 @@ namespace MediaCap.Capture
 
 			Debug.WriteLine("-----------------------------------------");
 #endif
-			return (this.videoDecoder != null)? true: false;
+			return (videoDecoder != null)? true: false;
 		}
 
 		/// <summary>
@@ -161,22 +159,19 @@ namespace MediaCap.Capture
 			get 
 			{
 				AnalogVideoStandard v;
-				if(this.videoDecoder != null)
+				if(videoDecoder != null)
 				{
 					int hr = videoDecoder.get_TVFormat(out v);
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 					return v;
 				}
-				else
-				{
-					return (AnalogVideoStandard.None);
-				}
+			    return (AnalogVideoStandard.None);
 			}
 			set
 			{
-				if(this.videoDecoder != null)
+				if(videoDecoder != null)
 				{
-					int hr = videoDecoder.put_TVFormat( (DShowNET.AnalogVideoStandard) value );
+					int hr = videoDecoder.put_TVFormat( value );
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 				}
 			}
@@ -190,16 +185,13 @@ namespace MediaCap.Capture
 			get
 			{
 				AnalogVideoStandard v;
-				if(this.videoDecoder != null)
+				if(videoDecoder != null)
 				{
 					int hr = videoDecoder.get_AvailableTVFormats(out v);
 					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
 					return v;
 				}
-				else
-				{
-					return (AnalogVideoStandard.None);
-				}
+			    return (AnalogVideoStandard.None);
 			}
 		}
 
@@ -267,9 +259,9 @@ namespace MediaCap.Capture
 #if DEBUG
 					String mediaSubType;
 					MakeFourCC(mediaType.subType, out mediaSubType);
-					Debug.WriteLine("Unknown color space (media subtype=" + mediaSubType + "):" + mediaType.subType.ToString());
+					Debug.WriteLine("Unknown color space (media subtype=" + mediaSubType + "):" + mediaType.subType);
 #endif
-					throw new ApplicationException("Unknown color space (media subtype):" + mediaType.subType.ToString());
+					throw new ApplicationException("Unknown color space (media subtype):" + mediaType.subType);
 				}
 			}
 			finally
@@ -399,27 +391,27 @@ namespace MediaCap.Capture
 			bool result = false;
 			try
 			{
-				ColorSpaceEnum currentValue = this.getMediaSubType(streamConfig);
-				if(this.subTypeList != null)
+				ColorSpaceEnum currentValue = getMediaSubType(streamConfig);
+				if(subTypeList != null)
 				{
-					this.subTypeList.Clear();
+					subTypeList.Clear();
 				}
 
 				foreach (object c in Enum.GetValues(typeof(ColorSpaceEnum)))
 				{
 					Guid subType = new Guid(LabelAttribute.FromMember(c));
-					if(this.setMediaSubType(streamConfig, subType))
+					if(setMediaSubType(streamConfig, subType))
 					{
-						if(this.subTypeList == null)
+						if(subTypeList == null)
 						{
-							this.subTypeList = new ArrayList();
+							subTypeList = new ArrayList();
 						}
 						// Check if subtype is already in list,
 						// if so then do not add, else add to list
 						bool notinlist = true;
-						for(int i = 0;(i < this.subTypeList.Count)&&(notinlist); i++)
+						for(int i = 0;(i < subTypeList.Count)&&(notinlist); i++)
 						{
-							if(((Guid)this.subTypeList[i]) == subType)
+							if(((Guid)subTypeList[i]) == subType)
 							{
 								notinlist = false;
 							}
@@ -427,12 +419,12 @@ namespace MediaCap.Capture
 
 						if(notinlist)
 						{
-							this.subTypeList.Add(subType);
+							subTypeList.Add(subType);
 							result = true;
 						}
 					}
 				}
-				this.setMediaSubType(streamConfig, currentValue);
+				setMediaSubType(streamConfig, currentValue);
 				return result;
 			}
 			catch {}

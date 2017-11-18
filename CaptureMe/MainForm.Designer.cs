@@ -1,11 +1,17 @@
-﻿namespace MediaCap
+﻿using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+using MediaCap.Properties;
+
+namespace MediaCap
 {
     partial class MainForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Освободить все используемые ресурсы.
@@ -40,6 +46,7 @@
             this.PreviewCheckBox = new System.Windows.Forms.CheckBox();
             this.PreviewPictureBox = new System.Windows.Forms.PictureBox();
             this.SnapshotButton = new System.Windows.Forms.Button();
+            this.TestButton = new System.Windows.Forms.Button();
             this.MainWindowMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PreviewPictureBox)).BeginInit();
             this.SuspendLayout();
@@ -139,11 +146,22 @@
             this.SnapshotButton.UseVisualStyleBackColor = true;
             this.SnapshotButton.Click += new System.EventHandler(this.SnapshotButton_Click);
             // 
+            // TestButton
+            // 
+            this.TestButton.Location = new System.Drawing.Point(416, 528);
+            this.TestButton.Name = "TestButton";
+            this.TestButton.Size = new System.Drawing.Size(50, 48);
+            this.TestButton.TabIndex = 8;
+            this.TestButton.Text = "Test";
+            this.TestButton.UseVisualStyleBackColor = true;
+            this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(664, 588);
+            this.Controls.Add(this.TestButton);
             this.Controls.Add(this.AudioDeviceCB);
             this.Controls.Add(this.VideoDeviceCB);
             this.Controls.Add(this.PreviewCheckBox);
@@ -164,17 +182,18 @@
         }
 
         #endregion
-        private System.Windows.Forms.ToolStripMenuItem VideoDeviceToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem AudioDeviceToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem captureToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.MenuStrip MainWindowMenuStrip;
-        public System.Windows.Forms.ToolStripMenuItem deviceToolStripMenuItem;
-        private System.Windows.Forms.ComboBox VideoDeviceCB;
-        private System.Windows.Forms.ComboBox AudioDeviceCB;
-        private System.Windows.Forms.CheckBox PreviewCheckBox;
-        private System.Windows.Forms.PictureBox PreviewPictureBox;
-        private System.Windows.Forms.Button SnapshotButton;
+        private ToolStripMenuItem VideoDeviceToolStripMenuItem;
+        private ToolStripMenuItem AudioDeviceToolStripMenuItem;
+        private ToolStripMenuItem captureToolStripMenuItem;
+        private ToolStripMenuItem aboutToolStripMenuItem;
+        private MenuStrip MainWindowMenuStrip;
+        public ToolStripMenuItem deviceToolStripMenuItem;
+        private ComboBox VideoDeviceCB;
+        private ComboBox AudioDeviceCB;
+        private CheckBox PreviewCheckBox;
+        private PictureBox PreviewPictureBox;
+        private Button SnapshotButton;
+        private Button TestButton;
     }
 }
 

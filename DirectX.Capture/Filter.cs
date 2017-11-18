@@ -8,7 +8,6 @@
 // ------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Runtime.InteropServices;
 #if DSHOWNET
 using DShowNET;
@@ -257,7 +256,7 @@ namespace MediaCap.Capture
 			if ( obj == null )
 				return( 1 );
 			Filter f = (Filter) obj;
-			return( this.Name.CompareTo( f.Name ) );
+			return( Name.CompareTo( f.Name ) );
 		}
 
 	}

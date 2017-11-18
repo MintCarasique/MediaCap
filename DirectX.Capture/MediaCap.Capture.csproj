@@ -88,9 +88,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsfFormat.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -103,6 +100,7 @@
     <Compile Include="Capture.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CaptureGraph.cs" />
     <Compile Include="CrossbarSource.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -110,9 +108,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DirectShowPropertyPage.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DxUtils.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Filter.cs">

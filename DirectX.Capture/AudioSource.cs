@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.InteropServices; 
+using System.Runtime.InteropServices;
 using DShowNET;
 
 namespace MediaCap.Capture
@@ -26,8 +26,8 @@ namespace MediaCap.Capture
 		{
 			if ( (pin as IAMAudioInputMixer) == null )
 				throw new NotSupportedException( "The input pin does not support the IAMAudioInputMixer interface" );
-			this.Pin = pin;
-			this.name = getName( pin );
+			Pin = pin;
+			name = getName( pin );
 		}
 
 

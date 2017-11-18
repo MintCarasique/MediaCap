@@ -8,8 +8,8 @@
 // ------------------------------------------------------------------
 
 using System;
-using System.Diagnostics; 
 using System.Collections;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 #if DSHOWNET
 using DShowNET;

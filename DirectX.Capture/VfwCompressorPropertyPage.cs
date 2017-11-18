@@ -1,20 +1,6 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-// ------------------------------------------------------------------
-
-using System;
-using System.Runtime.InteropServices; 
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
 namespace MediaCap.Capture
 {
@@ -31,7 +17,7 @@ namespace MediaCap.Capture
 		// ---------------- Properties --------------------
 
 		/// <summary> Video for Windows compression dialog interface </summary>
-		protected IAMVfwCompressDialogs vfwCompressDialogs = null;
+		protected IAMVfwCompressDialogs vfwCompressDialogs;
 
 		/// <summary> 
 		///  Get or set the state of the property page. This is used to save
@@ -51,7 +37,6 @@ namespace MediaCap.Capture
 		{
 			get 
 			{
-#if DSHOWNET 
 				byte[] data = null;
 				int size = 0;
 
@@ -63,32 +48,11 @@ namespace MediaCap.Capture
 					if ( hr != 0 ) data = null;
 				}
 				return( data );
-#else
-				IntPtr data = IntPtr.Zero;
-				int size = 0;
-
-				int hr = vfwCompressDialogs.GetState( IntPtr.Zero, ref size );
-				if ( ( hr == 0 ) && ( size > 0 ) )
-				{
-					int sizeIntPtr = (size + 3)/ 4;
-					data = Marshal.AllocCoTaskMem(sizeIntPtr);
-                    hr = vfwCompressDialogs.GetState(data, ref size);
-					if ( hr != 0 ) data = IntPtr.Zero;
-				}
-				return (byte[])Marshal.PtrToStructure(data, typeof(byte[]));
-#endif
 			}
 			set 
 			{
-#if DSHOWNET  
 				int hr = vfwCompressDialogs.SetState( value, value.Length );
 				if ( hr != 0 ) Marshal.ThrowExceptionForHR( hr );
-#else
-				IntPtr data = IntPtr.Zero;
-				Marshal.StructureToPtr(value, data, true);
-				int hr = vfwCompressDialogs.SetState( data, value.Length );
-				if ( hr != 0 ) Marshal.ThrowExceptionForHR( hr );
-#endif
 			}
 		}
 
@@ -100,7 +64,7 @@ namespace MediaCap.Capture
 		{
 			Name = name;
 			SupportsPersisting = true;
-			this.vfwCompressDialogs = compressDialogs;
+			vfwCompressDialogs = compressDialogs;
 		}
 
 

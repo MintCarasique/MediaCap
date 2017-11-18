@@ -9,6 +9,7 @@
 //
 // Copyright (C) 2006, 2007, 2008 Hans Vosman
 // ------------------------------------------------------------------
+
 using System;
 using System.Diagnostics;
 
@@ -159,7 +160,7 @@ namespace MediaCap.Capture
 			//
 			// TODO: Add constructor logic here
 			//
-			this.enabled = false;
+			enabled = false;
 		}
 
 		/// <summary>
@@ -181,12 +182,12 @@ namespace MediaCap.Capture
 			this.videoBitrate = videoBitrate;
 			this.audio = audio;
 			this.video = video;
-			this.enabled = false;
+			enabled = false;
 #if DEBUG
 			Debug.WriteLine(
-				"\"" + guid.ToString() + "\", \"" + name + "\", \"" + description + "\", " +
-				audioBitrate.ToString() + ", " + videoBitrate.ToString() + ", " +
-				audio.ToString() + ", " + video.ToString() + ", enabled=" + enabled.ToString());
+				"\"" + guid + "\", \"" + name + "\", \"" + description + "\", " +
+				audioBitrate + ", " + videoBitrate + ", " +
+				audio + ", " + video + ", enabled=" + enabled);
 #endif
 		}
 

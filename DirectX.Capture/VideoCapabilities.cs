@@ -1,29 +1,8 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-//
-//  2007-july-01    HV      - added modifications
-// - Added DSHOWNET conditional for using the older DShowNET library
-//   instead of the DirectShowLib library.
-// - Added AnalogVideoStandard
-//
-// Copyright (C) 2007 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Reflection;
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
 namespace MediaCap.Capture
 {
@@ -35,11 +14,9 @@ namespace MediaCap.Capture
 	{
 
 		// ------------------ Properties --------------------
-
-//#if NEWCODE
-		/// <summary> Analog video standard(s) </summary>
-		public AnalogVideoStandard AnalogVideoStandard;
-//#endif
+        
+		///// <summary> Analog video standard(s) </summary>
+		//public AnalogVideoStandard AnalogVideoStandard;
 
         /// <summary> Native size of the incoming video signal. This is the largest signal the filter can digitize with every pixel remaining unique. Read-only. </summary>
 		public Size InputSize;
@@ -73,9 +50,7 @@ namespace MediaCap.Capture
 			AMMediaType mediaType = null;
 			VideoStreamConfigCaps caps = null;
 			IntPtr pCaps = IntPtr.Zero;
-#if DSHOWNET
 			IntPtr pMediaType;
-#endif
 			try
 			{
 				// Ensure this device reports capabilities
@@ -95,25 +70,15 @@ namespace MediaCap.Capture
 #if DEBUG
 				for(int i = c - 1; i >= 0; i--)
 				{
-#if DSHOWNET
 					hr = videoStreamConfig.GetStreamCaps(i, out pMediaType, pCaps);
 #else
-					hr = videoStreamConfig.GetStreamCaps(i, out mediaType, pCaps);
-#endif
-#else
 				// Retrieve first (and hopefully only) capabilities struct
-#if DSHOWNET
 				hr = videoStreamConfig.GetStreamCaps( 0, out pMediaType, pCaps );
-#else
-				hr = videoStreamConfig.GetStreamCaps( 0, out mediaType, pCaps );
-#endif
 #endif
 					if ( hr != 0 ) Marshal.ThrowExceptionForHR( hr );
-
-#if DSHOWNET
+                    
 					// Convert pointers to managed structures
 					mediaType = (AMMediaType)Marshal.PtrToStructure(pMediaType, typeof(AMMediaType));
-#endif
 
 					// Convert pointers to managed structures
 					caps = (VideoStreamConfigCaps) Marshal.PtrToStructure(pCaps, typeof(VideoStreamConfigCaps));
@@ -127,26 +92,26 @@ namespace MediaCap.Capture
 					MinFrameRate = (double)10000000 / caps.MaxFrameInterval;
 					MaxFrameRate = (double)10000000 / caps.MinFrameInterval;
 //#if NEWCODE
-					this.AnalogVideoStandard = caps.VideoStandard;
+					//AnalogVideoStandard = caps.VideoStandard;
 //#endif
 #if DEBUG
 					if (caps.VideoStandard > AnalogVideoStandard.None)
 					{
 						Debug.WriteLine("Caps=" + 
-							caps.InputSize.ToString() + " " +
-							caps.MinOutputSize.ToString() + " " +
-							caps.MaxOutputSize.ToString() + " " +
-							MinFrameRate.ToString() + "-" +
-							MaxFrameRate.ToString() + " " +
-							caps.VideoStandard.ToString());
+							caps.InputSize + " " +
+							caps.MinOutputSize + " " +
+							caps.MaxOutputSize + " " +
+							MinFrameRate + "-" +
+							MaxFrameRate + " " +
+							caps.VideoStandard);
 						Debug.WriteLine("MediaType=" +
-							mediaType.majorType.ToString() + " " +
-							mediaType.subType.ToString() + " " +
-							mediaType.formatType.ToString() + " " +
-							mediaType.formatSize.ToString() + " " +
-							mediaType.fixedSizeSamples.ToString() + " " +
-							mediaType.sampleSize.ToString() + " " +
-							mediaType.temporalCompression.ToString());
+							mediaType.majorType + " " +
+							mediaType.subType + " " +
+							mediaType.formatType + " " +
+							mediaType.formatSize + " " +
+							mediaType.fixedSizeSamples + " " +
+							mediaType.sampleSize + " " +
+							mediaType.temporalCompression);
 					}
 				}
 #endif

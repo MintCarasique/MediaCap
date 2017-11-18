@@ -14,10 +14,9 @@
 // ------------------------------------------------------------------
 
 using System;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 #if DSHOWNET
-using DShowNET;
+
 #else
 using DirectShowLib;
 #endif
@@ -72,14 +71,8 @@ namespace MediaCap.Capture
 
 		// ---------------- Constructors --------------------
 
-		/// <summary> Constructor </summary>
-		public PropertyPage()
-		{
-		}
 
-
-
-		// ---------------- Public Methods --------------------
+	    // ---------------- Public Methods --------------------
 
 		/// <summary> 
 		///  Show the property page. Some property pages cannot be displayed 
