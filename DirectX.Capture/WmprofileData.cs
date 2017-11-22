@@ -75,10 +75,10 @@ namespace MediaCap.Capture
 		/// </summary>
 		public string Name
 		{
-			get { return name; }
-			set
+			get => name;
+		    set
 			{
-				if((value != null)&&(value.Length > 0))
+				if(!string.IsNullOrEmpty(value))
 				{
 					// In future check whether the name is unique
 					name = value;
@@ -89,67 +89,49 @@ namespace MediaCap.Capture
 		/// <summary>
 		/// Guid of profile (might be a null value)
 		/// </summary>
-		public Guid Guid
-		{
-			get { return guid; }
-		}
+		public Guid Guid => guid;
 
-		/// <summary>
+	    /// <summary>
 		/// Description of profile
 		/// </summary>
-		public string Description
-		{
-			get { return description; }
-		}
+		public string Description => description;
 
-		/// <summary>
+	    /// <summary>
 		/// Video bit rate value
 		/// </summary>
-		public int VideoBitrate
-		{
-			get { return videoBitrate; }
-		}
+		public int VideoBitrate => videoBitrate;
 
-		/// <summary>
+	    /// <summary>
 		/// Audio bit rate value
 		/// </summary>
-		public int AudioBitrate
-		{
-			get { return audioBitrate; }
-		}
+		public int AudioBitrate => audioBitrate;
 
-		/// <summary>
+	    /// <summary>
 		/// Indicates whether profile supports audio
 		/// </summary>
-		public bool Audio
-		{
-			get { return audio; }
-		}
+		public bool Audio => audio;
 
-		/// <summary>
+	    /// <summary>
 		/// Indicates whether profile supports video
 		/// </summary>
-		public bool Video
-		{
-			get { return video; }
-		}
+		public bool Video => video;
 
-		/// <summary>
+	    /// <summary>
 		/// Enabled flag
 		/// </summary>
 		public bool Enabled
 		{
-			get { return enabled; }
-			set { enabled = value; }
-		}
+			get => enabled;
+	        set => enabled = value;
+	    }
 
 		/// <summary>
 		/// Filename profile
 		/// </summary>
 		public string Filename
 		{
-			get { return filename; }
-			set { filename = value; }
+			get => filename;
+		    set => filename = value;
 		}
 
 		/// <summary>
@@ -157,9 +139,6 @@ namespace MediaCap.Capture
 		/// </summary>
 		internal WMProfileData()
 		{
-			//
-			// TODO: Add constructor logic here
-			//
 			enabled = false;
 		}
 
@@ -189,12 +168,6 @@ namespace MediaCap.Capture
 				audioBitrate + ", " + videoBitrate + ", " +
 				audio + ", " + video + ", enabled=" + enabled);
 #endif
-		}
-
-		/// <summary> Release resources. </summary>
-		~WMProfileData()
-		{
-			Dispose();
 		}
 
 		/// <summary> Release resources. </summary>

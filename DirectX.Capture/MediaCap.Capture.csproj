@@ -9,22 +9,23 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ApplicationIcon />
     <AssemblyKeyContainerName />
-    <AssemblyName>DirectX.Capture</AssemblyName>
+    <AssemblyName>MediaCap.Capture</AssemblyName>
     <AssemblyOriginatorKeyFile />
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
     <DelaySign>false</DelaySign>
     <OutputType>Library</OutputType>
-    <RootNamespace>DirectX.Capture</RootNamespace>
+    <RootNamespace>MediaCap.Capture</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <StartupObject />
     <FileUpgradeFlags>
     </FileUpgradeFlags>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>0.0</OldToolsVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -45,6 +46,7 @@
     <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -65,6 +67,7 @@
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DShowNET, Version=1.0.0.2, Culture=neutral, processorArchitecture=MSIL">
@@ -100,14 +103,10 @@
     <Compile Include="Capture.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CaptureGraph.cs" />
     <Compile Include="CrossbarSource.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DeviceInUseException.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DirectShowPropertyPage.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Filter.cs">
@@ -122,19 +121,10 @@
     <Compile Include="LabelAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PropertyPage.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PropertyPageCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Source.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SourceCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="VfwCompressorPropertyPage.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="VideoCapabilities.cs">

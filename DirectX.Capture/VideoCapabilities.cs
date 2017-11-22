@@ -91,9 +91,6 @@ namespace MediaCap.Capture
 					FrameSizeGranularityY = caps.OutputGranularityY;
 					MinFrameRate = (double)10000000 / caps.MaxFrameInterval;
 					MaxFrameRate = (double)10000000 / caps.MinFrameInterval;
-//#if NEWCODE
-					//AnalogVideoStandard = caps.VideoStandard;
-//#endif
 #if DEBUG
 					if (caps.VideoStandard > AnalogVideoStandard.None)
 					{

@@ -1,13 +1,3 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2009-Feb-27	HV		- created
-//  - Added Brian's Low 'december 2003' code
-//
-// Copyright (C) 2009 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 
 namespace MediaCap.Capture

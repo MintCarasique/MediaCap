@@ -170,6 +170,7 @@ namespace MediaCap
             this.Controls.Add(this.MainWindowMenuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.MainWindowMenuStrip;
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "MediaCap";
             this.Load += new System.EventHandler(this.MainForm_Load);

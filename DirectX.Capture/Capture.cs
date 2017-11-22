@@ -587,7 +587,6 @@ namespace MediaCap.Capture
                 if (value == null)
                 {
                     videoSources = null;
-                    PropertyPages = null;
                 }
             }
 		}
@@ -680,77 +679,9 @@ namespace MediaCap.Capture
                 if (value == null)
                 {
                     audioSources = null;
-                    PropertyPages = null;
                 }
             }
 		}
-
-		/// <summary>
-		///  Available property pages. 
-		/// </summary>
-		/// <remarks>
-		///  These are property pages exposed by the DirectShow filters. 
-		///  These property pages allow users modify settings on the 
-		///  filters directly. 
-		/// 
-		/// <para>
-		///  The information contained in this property is retrieved and
-		///  cached the first time this property is accessed. Future
-		///  calls to this property use the cached results. This was done 
-		///  for performance. </para>
-		///  
-		/// <para>
-		///  However, this means <b>you may get different results depending 
-		///  on when you access this property first</b>. If you are experiencing 
-		///  problems, try accessing the property immediately after creating 
-		///  the Capture class or immediately after setting the video and 
-		///  audio compressors. Also, inform the developer. </para>
-		/// </remarks>
-		public PropertyPageCollection PropertyPages 
-		{
-			get
-			{
-				if ( propertyPages == null )
-				{
-					try 
-					{
-						if( (_audioViaPci)&&
-							(audioDeviceFilter == null)&&(videoDeviceFilter != null) )
-						{
-							propertyPages = new PropertyPageCollection( 
-								captureGraphBuilder, 
-								videoDeviceFilter, videoDeviceFilter, 
-								videoCompressorFilter, audioCompressorFilter, 
-								VideoSources, AudioSources );
-						}
-						else
-						{
-                        propertyPages = new PropertyPageCollection( 
-							captureGraphBuilder, 
-							videoDeviceFilter, audioDeviceFilter, 
-							videoCompressorFilter, audioCompressorFilter, 
-							VideoSources, AudioSources );
-						}
-                    }
-					catch ( Exception ex ) { Debug.WriteLine( "PropertyPages: unable to get property pages." + ex ); }
-
-				}
-				return( propertyPages );
-			}
-            set
-            {
-                if (value == null)
-                {
-                    // Reload any property pages exposed by filters
-                    if (propertyPages != null)
-                    {
-                        propertyPages.Dispose();
-                        propertyPages = null;
-                    }
-                }
-            }
-		}
-	
 		/// <summary>
 		///  Gets and sets the frame rate used to capture video.
 		/// </summary>
@@ -935,7 +866,7 @@ namespace MediaCap.Capture
 		protected AudioCapabilities	audioCaps;					// Property Backer: capabilities of audio device
 		protected SourceCollection	videoSources;				// Property Backer: list of physical video sources
 		protected SourceCollection	audioSources;				// Property Backer: list of physical audio sources
-		protected PropertyPageCollection propertyPages;			// Property Backer: list of property pages exposed by filters
+		//protected PropertyPageCollection propertyPages;			// Property Backer: list of property pages exposed by filters
 		protected IGraphBuilder		graphBuilder;						// DShow Filter: Graph builder 
 		protected IMediaControl		mediaControl;						// DShow Filter: Start/Stop the filter graph -> copy of graphBuilder
 		protected IVideoWindow		videoWindow;						// DShow Filter: Control preview window -> copy of graphBuilder
@@ -1252,7 +1183,7 @@ namespace MediaCap.Capture
 		    audioSources = null;
 				
 		    // Reload any property pages exposed by filters
-		    PropertyPages = null;
+		    //PropertyPages = null;
 
 		    // Reload capabilities of video device
 		    videoCaps = null;
@@ -1664,7 +1595,7 @@ namespace MediaCap.Capture
 		    videoSources = null;
 		    audioSources?.Dispose();
 		    audioSources = null;
-            PropertyPages = null; // Disposal done within PropertyPages
+            //PropertyPages = null; // Disposal done within PropertyPages
 
 			// Cleanup
 			if ( graphBuilder != null )
@@ -1764,7 +1695,7 @@ namespace MediaCap.Capture
 				Marshal.PtrToStructure( pmt, mediaType );
 
 				// The formatPtr member points to different structures
-				// dependingon the formatType
+				// depending on the formatType
 				object formatStruct;
 				if ( mediaType.formatType == FormatType.WaveEx )
 					formatStruct = new WaveFormatEx();
@@ -2198,10 +2129,6 @@ namespace MediaCap.Capture
 		            propertyPageName = "Video Renderer";
 		        }
 		    }
-		    DirectShowPropertyPage propertyPage = new DirectShowPropertyPage(propertyPageName, specifyPropertyPages);
-		    if (propertyPage == null) return false;
-		    propertyPage.Show(o);
-		    propertyPage.Dispose();
 		    return true;
 		}
 

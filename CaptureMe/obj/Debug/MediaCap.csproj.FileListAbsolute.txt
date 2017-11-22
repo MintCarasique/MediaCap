@@ -15,9 +15,7 @@ D:\Documents\5_Semester\CourseWork\Early Alpha\CaptureMe\bin\Debug\DShowNET.pdb
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\MediaCap.exe.config
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\MediaCap.exe
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\MediaCap.pdb
-D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\DirectX.Capture.dll
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\DShowNET.dll
-D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\DirectX.Capture.pdb
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\DShowNET.pdb
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\obj\Debug\MediaCap.csprojResolveAssemblyReference.cache
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\obj\Debug\MediaCap.Properties.Resources.resources
@@ -26,3 +24,5 @@ D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\obj\Debug\MediaCap.csproj.
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\obj\Debug\MediaCap.exe
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\obj\Debug\MediaCap.pdb
 D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\obj\Debug\MediaCap.MainForm.resources
+D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\MediaCap.Capture.dll
+D:\Documents\5_Semester\CourseWork\MediaCap\CaptureMe\bin\Debug\MediaCap.Capture.pdb
