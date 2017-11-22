@@ -118,6 +118,7 @@
     <Compile Include="Filters.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Graph.cs" />
     <Compile Include="LabelAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

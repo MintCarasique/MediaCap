@@ -1,24 +1,7 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-// ------------------------------------------------------------------
-
 using System;
 using System.Runtime.InteropServices;
-#if DSHOWNET
 using DShowNET;
 using DShowNET.Device;
-#else
-#if VS2003
-#else
-using System.Runtime.InteropServices.ComTypes;
-#endif
-using DirectShowLib;
-#endif
 
 namespace MediaCap.Capture
 {
@@ -50,35 +33,19 @@ namespace MediaCap.Capture
 		/// <summary> Create a new filter from its moniker string. </summary>
 		public Filter( string monikerString )
 		{
-			Name = getName( monikerString );
+			Name = GetName( monikerString );
 			MonikerString = monikerString;
 		}
 
 		/// <summary> Create a new filter from its moniker </summary>
-#if DSHOWNET
 		internal Filter(UCOMIMoniker moniker )
-#else
-#if VS2003
-		internal Filter(UCOMIMoniker moniker )
-#else
-        internal Filter(IMoniker moniker)
-#endif
-#endif
 		{
-			Name = getName( moniker );
-			MonikerString = getMonikerString( moniker );
+			Name = GetName( moniker );
+			MonikerString = GetMonikerString( moniker );
 		}
 
 		/// <summary> Retrieve the a moniker's display name (i.e. it's unique string) </summary>
-#if DSHOWNET
-		protected string getMonikerString(UCOMIMoniker moniker)
-#else
-#if VS2003
-		protected string getMonikerString(UCOMIMoniker moniker)
-#else
-		protected string getMonikerString(IMoniker moniker)
-#endif
-#endif
+		protected string GetMonikerString(UCOMIMoniker moniker)
 		{
 			string s;
 			moniker.GetDisplayName( null, null, out s );
@@ -86,29 +53,17 @@ namespace MediaCap.Capture
 		}
 
 		/// <summary> Retrieve the human-readable name of the filter </summary>
-#if DSHOWNET
-		protected string getName(UCOMIMoniker moniker)
-#else
-#if VS2003
-		protected string getName(UCOMIMoniker moniker)
-#else
-		protected string getName(IMoniker moniker)
-#endif
-#endif
+		protected string GetName(UCOMIMoniker moniker)
 		{
 			object bagObj = null;
-			IPropertyBag bag = null;
+			IPropertyBag bag;
 			try 
 			{
 				Guid bagId = typeof( IPropertyBag ).GUID;
 				moniker.BindToStorage( null, null, ref bagId, out bagObj );
 				bag = (IPropertyBag) bagObj;
 				object val = "";
-#if DSHOWNET
 				int hr = bag.Read( "FriendlyName", ref val, IntPtr.Zero );
-#else
-                int hr = bag.Read("FriendlyName", out val, null);
-#endif
 				if( hr != 0 )
 					Marshal.ThrowExceptionForHR( hr );
 				string ret = val as string;
@@ -122,40 +77,28 @@ namespace MediaCap.Capture
 			}
 			finally
 			{
-				bag = null;
-				if( bagObj != null )
-					Marshal.ReleaseComObject( bagObj ); bagObj = null;
+			    if( bagObj != null )
+					Marshal.ReleaseComObject( bagObj );
 			}
 		}
 
 		/// <summary> Get a moniker's human-readable name based on a moniker string. </summary>
-		protected string getName(string monikerString)
+		protected string GetName(string monikerString)
 		{
-#if DSHOWNET
 			UCOMIMoniker parser = null; 
 			UCOMIMoniker moniker = null;
-#else
-#if VS2003
-			UCOMIMoniker parser = null; 
-			UCOMIMoniker moniker = null;
-#else
-            IMoniker parser = null;
-            IMoniker moniker = null;
-#endif
-#endif
 			try
 			{
-				parser = getAnyMoniker();
-				int eaten;
-				parser.ParseDisplayName( null, null, monikerString, out eaten, out moniker );
-				return( getName( parser ) );
+				parser = GetAnyMoniker();
+			    parser.ParseDisplayName( null, null, monikerString, out _, out moniker );
+				return( GetName( parser ) );
 			}
 			finally
 			{
 				if ( parser != null )
-					Marshal.ReleaseComObject( parser ); parser = null;
-				if ( moniker != null )
-					Marshal.ReleaseComObject( moniker ); moniker = null;
+					Marshal.ReleaseComObject( parser );
+			    if ( moniker != null )
+					Marshal.ReleaseComObject( moniker );
 			}
 		}
 
@@ -170,37 +113,18 @@ namespace MediaCap.Capture
 		///  This assumes there is at least one video compressor filter
 		///  installed on the system.
 		/// </summary>
-#if DSHOWNET
-		protected UCOMIMoniker getAnyMoniker()
-#else
-#if VS2003
-		protected UCOMIMoniker getAnyMoniker()
-#else
-        protected IMoniker getAnyMoniker()
-#endif
-#endif
+		protected UCOMIMoniker GetAnyMoniker()
 		{
 			Guid				category = FilterCategory.VideoCompressorCategory;
 			int					hr;
 			object				comObj = null;
-			ICreateDevEnum		enumDev = null;
-#if DSHOWNET
+			ICreateDevEnum		enumDev;
 			UCOMIEnumMoniker	enumMon = null;
 			UCOMIMoniker[]		mon = new UCOMIMoniker[1];
-#else
-#if VS2003
-			UCOMIEnumMoniker	enumMon = null;
-			UCOMIMoniker[]		mon = new UCOMIMoniker[1];
-#else
-            IEnumMoniker enumMon = null;
-            IMoniker[] mon = new IMoniker[1];
-#endif
-#endif
 
 			try 
 			{
 				// Get the system device enumerator
-#if DSHOWNET
 				Type srvType = Type.GetTypeFromCLSID( Clsid.SystemDeviceEnum );
 				if( srvType == null )
 					throw new NotImplementedException( "System Device Enumerator" );
@@ -209,29 +133,11 @@ namespace MediaCap.Capture
 
 				// Create an enumerator to find filters in category
 				hr = enumDev.CreateClassEnumerator( ref category, out enumMon, 0 );
-#else
-                // Get the system device enumerator
-                enumDev = (ICreateDevEnum)new DirectShowLib.CreateDevEnum();
-
-                // Create an enumerator to find filters in category
-                hr = enumDev.CreateClassEnumerator(category, out enumMon, CDef.None);
-#endif
 				if( hr != 0 )
 					throw new NotSupportedException( "No devices of the category" );
 
 				// Get first filter
-#if DSHOWNET
-				int f;
-				hr = enumMon.Next( 1, mon, out f );
-#else
-#if VS2003
-				int f;
-				hr = enumMon.Next( 1, mon, out f );
-#else
-                IntPtr f = IntPtr.Zero;
-                hr = enumMon.Next(1, mon, f);
-#endif
-#endif
+			    hr = enumMon.Next( 1, mon, out _ );
 				if( (hr != 0) )
 					mon[0] = null;
 
@@ -239,11 +145,10 @@ namespace MediaCap.Capture
 			}
 			finally
 			{
-				enumDev = null;
-				if( enumMon != null )
-					Marshal.ReleaseComObject( enumMon ); enumMon = null;
-				if( comObj != null )
-					Marshal.ReleaseComObject( comObj ); comObj = null;
+			    if( enumMon != null )
+					Marshal.ReleaseComObject( enumMon );
+			    if( comObj != null )
+					Marshal.ReleaseComObject( comObj );
 			}
 		}
 	

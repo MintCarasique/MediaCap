@@ -1,32 +1,8 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-//
-//  2007-July-01    HV      - added modifications
-// - Added DSHOWNET conditional for using the older DShowNET library
-//   instead of the DirectShowLib library
-// - Added a more informative exception message
-//
-// Copyright (C) 2007 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
-#if DSHOWNET
 using DShowNET;
 using DShowNET.Device;
-#else
-#if VS2003
-#else
-using System.Runtime.InteropServices.ComTypes;
-#endif
-using DirectShowLib;
-#endif
 
 namespace MediaCap.Capture
 {
@@ -41,31 +17,20 @@ namespace MediaCap.Capture
 		/// <summary> Populate the collection with a list of filters from a particular category. </summary>
 		internal FilterCollection(Guid category)
 		{
-			getFilters( category );
+			GetFilters( category );
 		}
 
 		/// <summary> Populate the InnerList with a list of filters from a particular category </summary>
-		protected void getFilters(Guid category)
+		protected void GetFilters(Guid category)
 		{
 			int					hr;
 			object				comObj = null;
-			ICreateDevEnum		enumDev = null;
-#if DSHOWNET
+			ICreateDevEnum		enumDev;
 			UCOMIEnumMoniker	enumMon = null;
 			UCOMIMoniker[]		mon = new UCOMIMoniker[1];
-#else
-#if VS2003
-			UCOMIEnumMoniker	enumMon = null;
-			UCOMIMoniker[]		mon = new UCOMIMoniker[1];
-#else
-			IEnumMoniker	enumMon = null;
-			IMoniker[]		mon = new IMoniker[1];
-#endif
-#endif
 
 			try 
 			{
-#if DSHOWNET
 				// Get the system device enumerator
 				Type srvType = Type.GetTypeFromCLSID( Clsid.SystemDeviceEnum );
 				if( srvType == null )
@@ -75,14 +40,7 @@ namespace MediaCap.Capture
 
 				// Create an enumerator to find filters in category
 				hr = enumDev.CreateClassEnumerator( ref category, out enumMon, 0 );
-#else
-				enumDev = (ICreateDevEnum) new CreateDevEnum();
-
-				// Create an enumerator to find filters in category
-				hr = enumDev.CreateClassEnumerator( category, out enumMon, 0 );
-#endif
 				if( hr != 0 )
-//#if NEWCODE
 				{
 					if(category == FilterCategory.VideoInputDevice)
 					{
@@ -108,32 +66,12 @@ namespace MediaCap.Capture
 						throw new NotSupportedException( "No devices of the category " + category );
 					}
 				}
-//#else
-//				throw new NotSupportedException( "No devices of the category" );
-//#endif
 
 				// Loop through the enumerator
-#if DSHOWNET
-				int f = 0;
-#else
-#if VS2003
-				int f = 0;
-#else
-				IntPtr f = IntPtr.Zero;
-#endif
-#endif
-				do
+			    do
 				{
 					// Next filter
-#if DSHOWNET
-					hr = enumMon.Next( 1, mon, out f );
-#else
-#if VS2003
-					hr = enumMon.Next( 1, mon, out f );
-#else
-					hr = enumMon.Next( 1, mon, f );
-#endif
-#endif
+					hr = enumMon.Next( 1, mon, out _ );
 					if( (hr != 0) || (mon[0] == null) )
 						break;
 					
@@ -152,20 +90,16 @@ namespace MediaCap.Capture
 			}
 			finally
 			{
-				enumDev = null;
-				if( mon[0] != null )
+			    if( mon[0] != null )
 					Marshal.ReleaseComObject( mon[0] ); mon[0] = null;
 				if( enumMon != null )
-					Marshal.ReleaseComObject( enumMon ); enumMon = null;
-				if( comObj != null )
-					Marshal.ReleaseComObject( comObj ); comObj = null;
+					Marshal.ReleaseComObject( enumMon );
+			    if( comObj != null )
+					Marshal.ReleaseComObject( comObj );
 			}
 		}
 
 		/// <summary> Get the filter at the specified index. </summary>
-		public Filter this[int index]
-		{
-			get { return( (Filter) InnerList[index] ); }
-		}
+		public Filter this[int index] => (Filter) InnerList[index];
 	}
 }
