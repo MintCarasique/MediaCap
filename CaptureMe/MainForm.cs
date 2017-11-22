@@ -63,7 +63,12 @@ namespace MediaCap
 
         private void TestButton_Click(object sender, EventArgs e)
         {
-            _captureClass.SaveImage(ref PreviewPictureBox);
+            _captureClass.StartCapture();
+        }
+
+        private void StopButton_Click(object sender, EventArgs e)
+        {
+            _captureClass.StopCapture();
         }
     }
 }

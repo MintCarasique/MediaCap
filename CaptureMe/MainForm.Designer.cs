@@ -47,6 +47,7 @@ namespace MediaCap
             this.PreviewPictureBox = new System.Windows.Forms.PictureBox();
             this.SnapshotButton = new System.Windows.Forms.Button();
             this.TestButton = new System.Windows.Forms.Button();
+            this.StopButton = new System.Windows.Forms.Button();
             this.MainWindowMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PreviewPictureBox)).BeginInit();
             this.SuspendLayout();
@@ -156,11 +157,22 @@ namespace MediaCap
             this.TestButton.UseVisualStyleBackColor = true;
             this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
             // 
+            // StopButton
+            // 
+            this.StopButton.Location = new System.Drawing.Point(472, 528);
+            this.StopButton.Name = "StopButton";
+            this.StopButton.Size = new System.Drawing.Size(50, 48);
+            this.StopButton.TabIndex = 9;
+            this.StopButton.Text = "Test";
+            this.StopButton.UseVisualStyleBackColor = true;
+            this.StopButton.Click += new System.EventHandler(this.StopButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(664, 588);
+            this.Controls.Add(this.StopButton);
             this.Controls.Add(this.TestButton);
             this.Controls.Add(this.AudioDeviceCB);
             this.Controls.Add(this.VideoDeviceCB);
@@ -195,6 +207,7 @@ namespace MediaCap
         private PictureBox PreviewPictureBox;
         private Button SnapshotButton;
         private Button TestButton;
+        private Button StopButton;
     }
 }
 
