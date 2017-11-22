@@ -314,11 +314,11 @@ namespace MediaCap.Capture
 		
 		public string Filename 
 		{ 
-			get => ( filename );
+			get => filename;
             set 
 			{ 
 				assertStopped();
-				if ( Cued )
+				if (Cued)
 					throw new InvalidOperationException( "The Filename cannot be changed once cued. Use Stop() before changing the filename." );
 				filename = value; 
 				if ( fileWriterFilter != null )
@@ -744,15 +744,13 @@ namespace MediaCap.Capture
 		{
 			get
 			{
-				BitmapInfoHeader bmiHeader;
-				bmiHeader = (BitmapInfoHeader) GetStreamConfigSetting( videoStreamConfig, "BmiHeader" );
-				Size size = new Size( bmiHeader.Width, bmiHeader.Height );
+			    var bmiHeader = (BitmapInfoHeader) GetStreamConfigSetting( videoStreamConfig, "BmiHeader" );
+				var size = new Size( bmiHeader.Width, bmiHeader.Height );
 				return( size );
 			}
 			set
 			{
-				BitmapInfoHeader bmiHeader;
-				bmiHeader = (BitmapInfoHeader) GetStreamConfigSetting( videoStreamConfig, "BmiHeader" );
+			    var bmiHeader = (BitmapInfoHeader) GetStreamConfigSetting( videoStreamConfig, "BmiHeader" );
 				bmiHeader.Width = value.Width;
 				bmiHeader.Height = value.Height;
 				SetStreamConfigSetting( videoStreamConfig, "BmiHeader", bmiHeader );

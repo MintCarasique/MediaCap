@@ -254,7 +254,6 @@ namespace MediaCap.Capture
             {
                 // Render preview (video -> renderer)
                 InitVideoRenderer();
-                //this.AddDeInterlaceFilter();
 
                 // When capture pin is used, preview works immediately,
                 // however this conflicts with file saving.
