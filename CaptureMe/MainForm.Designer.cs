@@ -149,11 +149,12 @@ namespace MediaCap
             // 
             // TestButton
             // 
+            this.TestButton.Font = new System.Drawing.Font("Courier New", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.TestButton.Location = new System.Drawing.Point(416, 528);
             this.TestButton.Name = "TestButton";
             this.TestButton.Size = new System.Drawing.Size(50, 48);
             this.TestButton.TabIndex = 8;
-            this.TestButton.Text = "Test";
+            this.TestButton.Text = "•";
             this.TestButton.UseVisualStyleBackColor = true;
             this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
             // 
