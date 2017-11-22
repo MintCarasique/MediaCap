@@ -1,18 +1,5 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-// ------------------------------------------------------------------
-
 using System;
-#if DSHOWNET
 
-#else
-using DirectShowLib;
-#endif
 namespace MediaCap.Capture
 {
 	/// <summary>
@@ -26,15 +13,15 @@ namespace MediaCap.Capture
         /// <summary>
         /// Name of the source
         /// </summary>
-		protected string				name;
+		protected string name;
 
 
 		// ----------------------- Public properties -------------------------
 
 		/// <summary> The name of the source. Read-only. </summary>
-		public string Name { get { return( name ); } }
+		public string Name => name;
 
-		/// <summary> Obtains the String representation of this instance. </summary>
+	    /// <summary> Obtains the String representation of this instance. </summary>
 		public override string ToString() { return( Name ); }
 
 		/// <summary> Is this source enabled. </summary>

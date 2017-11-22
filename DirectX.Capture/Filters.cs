@@ -1,24 +1,4 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-//
-//  2007-July-01    HV      - added modifications
-// - Added DSHOWNET conditional for using the older DShowNET library
-//   instead of the DirectShowLib library
-// - Added legacy Directshow filters
-//
-// Copyright (C) 2007 Hans Vosman
-// ------------------------------------------------------------------
-
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
 namespace MediaCap.Capture
 {
@@ -54,10 +34,8 @@ namespace MediaCap.Capture
 
 		/// <summary> Collection of available audio compressors. </summary>
 		public FilterCollection AudioCompressors = new FilterCollection( FilterCategory.AudioCompressorCategory ); 
-
-//#if NEWCODE
+        
 		/// <summary> Collection of available audio compressors. </summary>
 		public FilterCollection LegacyFilters = new FilterCollection(FilterCategory.LegacyAmFilterCategory); 
-//#endif
 	}
 }

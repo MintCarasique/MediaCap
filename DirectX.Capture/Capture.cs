@@ -645,7 +645,7 @@ namespace MediaCap.Capture
 								// together. Too many checks however, might
 								// limit functionality or make the code
 								// complex. For now, keep it simple ...
-								audioSources.addFromGraph( captureGraphBuilder, videoDeviceFilter, false );
+								audioSources.AddFromGraph( captureGraphBuilder, videoDeviceFilter, false );
 							}
                         }
                         else
@@ -666,7 +666,7 @@ namespace MediaCap.Capture
 								// together. Too many checks however, might
 								// limit functionality or make the code
 								// complex. For now, keep it simple ...
-								audioSources.addFromGraph( captureGraphBuilder, videoDeviceFilter, false );
+								audioSources.AddFromGraph( captureGraphBuilder, videoDeviceFilter, false );
 							}
                         }
 					}

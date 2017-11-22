@@ -1,15 +1,3 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-// 2006-March-1 HV - created
-//
-// 2008-Apr-8   HV - modified
-// - profile filename attribute added
-//
-// Copyright (C) 2006, 2007, 2008 Hans Vosman
-// ------------------------------------------------------------------
-
 using System;
 using System.Diagnostics;
 
@@ -171,11 +159,11 @@ namespace MediaCap.Capture
 		}
 
 		/// <summary> Release resources. </summary>
-		public virtual void Dispose()
-		{
-			name = null;
-			description = null;
-			filename = null;
-		}
+		//public virtual void Dispose()
+		//{
+		//    name = null;
+		//    description = null;
+		//    filename = null;
+		//}
 	}
 }

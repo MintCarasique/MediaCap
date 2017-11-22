@@ -1,21 +1,8 @@
-// ------------------------------------------------------------------
-// DirectX.Capture
-//
-// History:
-//	2003-Jan-24		BL		- created
-//
-// Copyright (c) 2003 Brian Low
-// ------------------------------------------------------------------
-
 using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-#if DSHOWNET
 using DShowNET;
-#else
-using DirectShowLib;
-#endif
 
 namespace MediaCap.Capture
 {
@@ -42,7 +29,7 @@ namespace MediaCap.Capture
 		/// <summary> Initialize collection with sources from graph. </summary>
 		internal SourceCollection(ICaptureGraphBuilder2 graphBuilder, IBaseFilter deviceFilter, bool isVideoDevice)
 		{
-			addFromGraph( graphBuilder, deviceFilter, isVideoDevice );
+			AddFromGraph( graphBuilder, deviceFilter, isVideoDevice );
 		}
 
 		/// <summary> Destructor. Release unmanaged resources. </summary>
@@ -56,12 +43,9 @@ namespace MediaCap.Capture
 		// -------------------- Public Properties -----------------------
 
 		/// <summary> Get the source at the specified index. </summary>
-		public Source this[int index]
-		{
-			get { return( (Source) InnerList[index] ); }
-		}
+		public Source this[int index] => (Source) InnerList[index];
 
-		/// <summary>
+	    /// <summary>
 		///  Gets or sets the source/physical connector currently in use.
 		///  This is marked internal so that the Capture class can control
 		///  how and when the source is changed.
@@ -83,26 +67,26 @@ namespace MediaCap.Capture
 			}
 			set
 			{
-				if ( value == null )
-				{
-					// Disable all sources
-					foreach ( Source s in InnerList )
-						s.Enabled = false;
-				}
-				else if ( value is CrossbarSource )
-				{
-					// Enable this source
-					// (this will automatically disable all other sources)
-					value.Enabled = true;
-				}
-				else
-				{
-					// Disable all sources
-					// Enable selected source
-					foreach ( Source s in InnerList )
-						s.Enabled = false;
-					value.Enabled = true;
-				}
+			    switch (value)
+			    {
+			        case null:
+			            // Disable all sources
+			            foreach ( Source s in InnerList )
+			                s.Enabled = false;
+			            break;
+			        case CrossbarSource _:
+			            // Enable this source
+			            // (this will automatically disable all other sources)
+			            value.Enabled = true;
+			            break;
+			        default:
+			            // Disable all sources
+			            // Enable selected source
+			            foreach ( Source s in InnerList )
+			                s.Enabled = false;
+			            value.Enabled = true;
+			            break;
+			    }
 			}
 		}
 
@@ -128,20 +112,16 @@ namespace MediaCap.Capture
 
 
 		// -------------------- Protected Methods -----------------------
-
-//#if NEWCODE
+        
 		/// <summary> Populate the collection from a filter graph. </summary>
-		public void addFromGraph(ICaptureGraphBuilder2 graphBuilder, IBaseFilter deviceFilter, bool isVideoDevice)
-//#else
-//		protected void addFromGraph ( ICaptureGraphBuilder2 graphBuilder, IBaseFilter deviceFilter, bool isVideoDevice )
-//#endif
+		public void AddFromGraph(ICaptureGraphBuilder2 graphBuilder, IBaseFilter deviceFilter, bool isVideoDevice)
 		{
 			Trace.Assert( graphBuilder != null );
 
 			ArrayList crossbars = findCrossbars( graphBuilder, deviceFilter );
 			foreach ( IAMCrossbar crossbar in crossbars )
 			{
-				ArrayList sources = findCrossbarSources( graphBuilder, crossbar, isVideoDevice );
+				ArrayList sources = FindCrossbarSources( graphBuilder, crossbar, isVideoDevice );
 				InnerList.AddRange( sources );
 			}
 
@@ -149,7 +129,7 @@ namespace MediaCap.Capture
 			{
 				if ( InnerList.Count == 0 )
 				{
-					ArrayList sources = findAudioSources( graphBuilder, deviceFilter );
+					ArrayList sources = FindAudioSources( graphBuilder, deviceFilter );
 					InnerList.AddRange( sources );
 
 				}
@@ -174,11 +154,7 @@ namespace MediaCap.Capture
 			object comObjNext = null;
 
 			// Find the first interface, look upstream from the selected device
-#if DSHOWNET
 			hr = graphBuilder.FindInterface( ref category, ref type, deviceFilter, ref riid, out comObj );
-#else
-			hr = graphBuilder.FindInterface( category, type, deviceFilter, riid, out comObj );
-#endif
 			while ( (hr == 0) && (comObj != null) )
 			{
 				// If found, add to the list
@@ -187,11 +163,7 @@ namespace MediaCap.Capture
 					crossbars.Add( comObj as IAMCrossbar );
 
 					// Find the second interface, look upstream from the next found crossbar
-#if DSHOWNET
 					hr = graphBuilder.FindInterface( ref category, ref type, comObj as IBaseFilter, ref riid, out comObjNext );
-#else
-					hr = graphBuilder.FindInterface( category, type, comObj as IBaseFilter, riid, out comObjNext );
-#endif
 					comObj = comObjNext;
 				}
 				else
@@ -208,7 +180,7 @@ namespace MediaCap.Capture
 		///  parameter on the constructor) so we check each source before adding
 		///  it to the list.
 		/// </summary>
-		protected ArrayList findCrossbarSources(ICaptureGraphBuilder2 graphBuilder, IAMCrossbar crossbar, bool isVideoDevice)
+		protected ArrayList FindCrossbarSources(ICaptureGraphBuilder2 graphBuilder, IAMCrossbar crossbar, bool isVideoDevice)
 		{
 			ArrayList sources = new ArrayList();
 			int hr;
@@ -313,7 +285,7 @@ namespace MediaCap.Capture
 					return( sources );
 		}
 
-		protected ArrayList findAudioSources(ICaptureGraphBuilder2 graphBuilder, IBaseFilter deviceFilter)
+		protected ArrayList FindAudioSources(ICaptureGraphBuilder2 graphBuilder, IBaseFilter deviceFilter)
 		{
 			ArrayList sources = new ArrayList();
 			IAMAudioInputMixer audioInputMixer = deviceFilter as IAMAudioInputMixer;
@@ -323,23 +295,15 @@ namespace MediaCap.Capture
 				IEnumPins pinEnum;
 				int hr = deviceFilter.EnumPins( out pinEnum );
 				pinEnum.Reset();
-				if( (hr == 0) && (pinEnum != null) )
+				if( (hr == 0) && pinEnum != null )
 				{
 					// Loop through each pin
 					IPin[] pins = new IPin[1];
-#if VS2003 || DSHOWNET
 					int f;
-#else
-                    IntPtr f = IntPtr.Zero;
-#endif
 					do
 					{
 						// Get the next pin
-#if VS2003 || DSHOWNET
 						hr = pinEnum.Next( 1, pins, out f );
-#else
-                        hr = pinEnum.Next(1, pins, f);
-#endif
 						if( (hr == 0) && (pins[0] != null) )
 						{
 							// Is this an input pin?
@@ -366,7 +330,7 @@ namespace MediaCap.Capture
 			if ( sources.Count == 1 )
 				sources.Clear();
 
-			return( sources );
+			return sources;
 		}
 
 	}

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using DShowNET;
-using DShowNET.Device;
-using System.Threading.Tasks;
 
 namespace MediaCap.Capture
 {
@@ -14,10 +9,6 @@ namespace MediaCap.Capture
     {
         protected void CreateGraph()
         {
-            Guid cat;
-            Guid med;
-            int hr;
-
             // Ensure required properties are set
             if (videoDevice == null && audioDevice == null)
                 throw new ArgumentException("The video and/or audio device have not been set. Please set one or both to valid capture devices.\n");
@@ -34,7 +25,7 @@ namespace MediaCap.Capture
             captureGraphBuilder = (ICaptureGraphBuilder2)DsBugWO.CreateDsInstance(ref clsid, ref riid);
 
             // Link the CaptureGraphBuilder to the filter graph
-            hr = captureGraphBuilder.SetFiltergraph(graphBuilder);
+            var hr = captureGraphBuilder.SetFiltergraph(graphBuilder);
             if (hr < 0) Marshal.ThrowExceptionForHR(hr);
 
             // Add the graph to the Running Object Table so it can be
@@ -81,8 +72,8 @@ namespace MediaCap.Capture
 
             // Try looking for an interleaved media type
             object o;
-            cat = PinCategory.Capture;
-            med = MediaType.Interleaved;
+            var cat = PinCategory.Capture;
+            var med = MediaType.Interleaved;
             Guid iid = typeof(IAMStreamConfig).GUID;
             hr = captureGraphBuilder.FindInterface(
                 ref cat, ref med, videoDeviceFilter, ref iid, out o);
@@ -97,7 +88,6 @@ namespace MediaCap.Capture
             }
             videoStreamConfig = o as IAMStreamConfig;
 
-            o = null;
             cat = PinCategory.Preview;
             med = MediaType.Interleaved;
             iid = typeof(IAMStreamConfig).GUID;
@@ -114,7 +104,6 @@ namespace MediaCap.Capture
                     o = null;
             }
             previewStreamConfig = o as IAMStreamConfig;
-            o = null;
             cat = PinCategory.Capture;
             med = MediaType.Audio;
             iid = typeof(IAMStreamConfig).GUID;
@@ -204,13 +193,12 @@ namespace MediaCap.Capture
             {
                 // Render the file writer portion of graph (mux -> file)
                 // Record captured audio/video in Avi format
-                Guid mediaSubType; // Media sub type
                 bool captureAudio = true;
                 bool captureVideo = true;
-                IBaseFilter videoCompressorfilter = null;
+                IBaseFilter videoCompressorfilter;
 
                 // Set media sub type and video compressor filter if needed
-                mediaSubType = MediaSubType.Avi;
+                var mediaSubType = MediaSubType.Avi;
                 // For Avi file saving a video compressor must be used
                 // If one is selected, that one will be used.
                 videoCompressorfilter = videoCompressorFilter;
@@ -219,7 +207,7 @@ namespace MediaCap.Capture
                 hr = captureGraphBuilder.SetOutputFileName(ref mediaSubType, Filename, out muxFilter, out fileWriterFilter);
                 if (hr < 0) Marshal.ThrowExceptionForHR(hr);
                 // Render video (video -> mux) if needed or possible
-                if ((VideoDevice != null) && (captureVideo))
+                if ((VideoDevice != null) && captureVideo)
                 {
                     // Try interleaved first, because if the device supports it,
                     // it's the only way to get audio as well as video
@@ -236,7 +224,7 @@ namespace MediaCap.Capture
                 }
 
                 // Render audio (audio -> mux) if possible
-                if ((audioDeviceFilter != null) && (captureAudio))
+                if ((audioDeviceFilter != null) && captureAudio)
                 {
                     // If this Asf file format than please keep in mind that
                     // certain Wmv formats do not have an audio stream, so

@@ -103,6 +103,9 @@ namespace CaptureMe
             Graphics g = Graphics.FromImage(b);
             g.CopyFromScreen(r.Location, new Point(0, 0), r.Size);
             b.Save("D:\\Documents\\5_Semester\\CourseWork\\MediaCap\\CaptureMe\\bin\\Debug\\" + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Year + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + ".jpg");
+            g.Dispose();
+            b.Dispose();
+
         }
 
         public void StartCapture()
