@@ -34,9 +34,9 @@ namespace MediaCap
 
         private void PreviewCheckBox_Click(object sender, EventArgs e)
         {
-            if (VideoDeviceCB.SelectedIndex == 0 || AudioDeviceCB.SelectedIndex == 0)
+            if (VideoDeviceCB.SelectedIndex == 0)
             {
-                MessageBox.Show("Cannot activate preview. Video or audio device not choosed");
+                MessageBox.Show("Cannot activate preview. Video device not choosed");
                 PreviewCheckBox.Checked = false;
             }
             else

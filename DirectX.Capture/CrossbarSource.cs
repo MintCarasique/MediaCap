@@ -3,101 +3,90 @@ using DShowNET;
 
 namespace MediaCap.Capture
 {
-	/// <summary>
-	///  Represents a physical connector or source on an 
-	///  audio/video device. This class is used on filters that
-	///  support the IAMCrossbar interface such as TV Tuners.
-	/// </summary>
-	public class CrossbarSource : Source
+    /// <summary>
+    ///  Представляет собой физический коннектор или источник. Используется фильтрами,
+    /// которые поддерживают интерфейс IAMCrossbar, например, TV-тюнерами
+    /// </summary>
+    public class CrossbarSource : Source
 	{
-		// --------------------- Private/Internal properties -------------------------
+		internal IAMCrossbar Crossbar;	//Кроссбар фильтр (COM объект)
+		internal int OutputPin;	// Количество выходов кроссбара
+		internal int InputPin;	//Количество входов кроссбара
+		internal int RelatedInputPin = -1;	//Обычно представляет собой аудиовход
+		internal CrossbarSource	RelatedInputSource;	// the Crossbar source associated with the RelatedInputPin
+		internal PhysicalConnectorType ConnectorType; //Тип коннектора
 
-		internal IAMCrossbar			Crossbar;				// crossbar filter (COM object)
-		internal int					OutputPin;				// output pin number on the crossbar
-		internal int					InputPin;				// input pin number on the crossbar
-		internal int					RelatedInputPin = -1;	// usually the audio input pin for the same source
-		internal CrossbarSource			RelatedInputSource;		// the Crossbar source associated with the RelatedInputPin
-		internal PhysicalConnectorType	ConnectorType;			// type of the connector
-
-
-
-		// ----------------------- Public properties -------------------------
-
-		/// <summary> Enabled or disable this source. </summary>
+        /// <summary> Активирует или деактивирует этот источник. </summary>
 		public override bool Enabled
 		{
 			get 
 			{
 				int i;
-				if ( Crossbar.get_IsRoutedTo( OutputPin, out i ) == 0 )
-					if ( InputPin == i )
-						return( true );
-				return( false );
+				if (Crossbar.get_IsRoutedTo(OutputPin, out i) == 0)
+					if (InputPin == i)
+						return true;
+				return false;
 			}
 
 			set
 			{
-				if ( value )
+				if (value)
 				{
-					// Enable this route
-					int hr = Crossbar.Route( OutputPin, InputPin );
-					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+					// Активируем данный маршрут
+					int hr = Crossbar.Route(OutputPin, InputPin);
+					if ( hr < 0 )
+                        Marshal.ThrowExceptionForHR(hr);
 
-					// Enable the related pin as well
+					// Активируем стандартный входной пин
 					if ( RelatedInputSource != null )
 					{
-						hr = Crossbar.Route( RelatedInputSource.OutputPin, RelatedInputSource.InputPin );  
-						if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+						hr = Crossbar.Route(RelatedInputSource.OutputPin, RelatedInputSource.InputPin);  
+						if (hr < 0)
+                            Marshal.ThrowExceptionForHR(hr);
 
 					}
 				}
 				else
 				{
-					// Disable this route by routing the output
-					// pin to input pin -1
-					int hr = Crossbar.Route( OutputPin, -1 );
-					if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+					// Деактивируем данный маршрут направляя его на пин -1
+					int hr = Crossbar.Route(OutputPin, -1);
+					if (hr < 0)
+                        Marshal.ThrowExceptionForHR(hr);
 
-					// Disable the related pin as well
+					// Деактивируем стандартный входной пин
 					if ( RelatedInputSource != null )
 					{
-						hr = Crossbar.Route( RelatedInputSource.OutputPin, -1 );  
-						if ( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+						hr = Crossbar.Route(RelatedInputSource.OutputPin, -1);  
+						if (hr < 0)
+                            Marshal.ThrowExceptionForHR(hr);
 
 					}
 				}
 			}
 		}
-
-
-		
-		// -------------------- Constructors/Destructors ----------------------
-
-		/// <summary> Constructor. This class cannot be created directly. </summary>
-		internal CrossbarSource( IAMCrossbar crossbar, int outputPin, int inputPin, PhysicalConnectorType connectorType )
+        
+		internal CrossbarSource(IAMCrossbar crossbar, int outputPin, int inputPin, PhysicalConnectorType connectorType)
 		{
 			Crossbar = crossbar;
 			OutputPin = outputPin;
 			InputPin = inputPin;
 			ConnectorType = connectorType;
-			name = getName( connectorType );
+			name = GetName(connectorType);
 		}
 
 		/// <summary> Constructor. This class cannot be created directly. </summary>
-		internal CrossbarSource( IAMCrossbar crossbar, int outputPin, int inputPin, int relatedInputPin, PhysicalConnectorType connectorType )
+		internal CrossbarSource(IAMCrossbar crossbar, int outputPin, int inputPin, int relatedInputPin, PhysicalConnectorType connectorType)
 		{
 			Crossbar = crossbar;
 			OutputPin = outputPin;
 			InputPin = inputPin;
 			RelatedInputPin = relatedInputPin; 
 			ConnectorType = connectorType;
-			name = getName( connectorType );
+			name = GetName(connectorType);
 		}
 
-		// --------------------------- Private methods ----------------------------
-
-		/// <summary> Retrieve the friendly name of a connectorType. </summary>
-		private string getName( PhysicalConnectorType connectorType )
+		/// <summary>Возвращает удобное для чтения название коннектора</summary>
+		private string GetName(PhysicalConnectorType connectorType)
 		{
 			string name;
 			switch( connectorType )
@@ -130,7 +119,7 @@ namespace MediaCap.Capture
 
 				default:											name = "Unknown Connector";		break;
 			}
-			return( name );
+			return name;
 		}
 	}
 }

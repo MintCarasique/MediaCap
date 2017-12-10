@@ -27,8 +27,8 @@ namespace MediaCap.Capture
 		/// <summary> Is this source enabled. </summary>
 		public virtual bool Enabled 
 		{
-			get { throw new NotSupportedException( "This method should be overriden in derrived classes." ); } 
-			set { throw new NotSupportedException( "This method should be overriden in derrived classes." ); } 
+			get => throw new NotSupportedException( "This method should be overriden in derrived classes." );
+		    set => throw new NotSupportedException( "This method should be overriden in derrived classes." );
 		}
 
 		

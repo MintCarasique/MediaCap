@@ -112,7 +112,7 @@ namespace CaptureMe
         public void StartCapture()
         {
             _capture.Filename = "D:\\Documents\\5_Semester\\CourseWork\\MediaCap\\CaptureMe\\bin\\Debug\\Test.avi";
-            if(_capture.Stopped)
+            if (_capture.Stopped)
                 _capture?.Start();
         }
 

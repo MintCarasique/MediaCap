@@ -326,11 +326,13 @@ namespace MediaCap.Capture
 					string s;
 					AMMediaType mt = new AMMediaType(); 
 					int hr = fileWriterFilter.GetCurFile( out s, mt );
-					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+					if( hr < 0 )
+                        Marshal.ThrowExceptionForHR( hr );
 					if ( mt.formatSize > 0 )
 						Marshal.FreeCoTaskMem( mt.formatPtr ); 
 					hr = fileWriterFilter.SetFileName( filename, mt );
-					if( hr < 0 ) Marshal.ThrowExceptionForHR( hr );
+					if( hr < 0 )
+                        Marshal.ThrowExceptionForHR( hr );
 				}
 			} 
 		}
@@ -746,7 +748,7 @@ namespace MediaCap.Capture
 			{
 			    var bmiHeader = (BitmapInfoHeader) GetStreamConfigSetting( videoStreamConfig, "BmiHeader" );
 				var size = new Size( bmiHeader.Width, bmiHeader.Height );
-				return( size );
+				return size;
 			}
 			set
 			{
@@ -780,8 +782,8 @@ namespace MediaCap.Capture
 		{
 			get
 			{
-				short audioChannels = (short) GetStreamConfigSetting( audioStreamConfig, "nChannels" );
-				return( audioChannels );
+				short audioChannels = (short) GetStreamConfigSetting(audioStreamConfig, "nChannels");
+				return audioChannels;
 			}
 			set => SetStreamConfigSetting( audioStreamConfig, "nChannels", value );
 		}
