@@ -71,6 +71,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -92,6 +93,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\photo-camera.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\capture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_32_171485.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\59537bae5d80f15cee1b212f.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

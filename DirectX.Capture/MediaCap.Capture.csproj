@@ -122,12 +122,14 @@
     <Compile Include="LabelAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PropertyPage.cs" />
     <Compile Include="Source.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SourceCollection.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="VfwCompressorPropertyPage.cs" />
     <Compile Include="VideoCapabilities.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -137,6 +139,9 @@
     <Compile Include="WmprofileData.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

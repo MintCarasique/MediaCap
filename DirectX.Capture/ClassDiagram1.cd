@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MediaCap.Capture.Capture" Collapsed="true">
+    <Position X="2.75" Y="2" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="MediaCap.Capture.Capture.GraphState" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Capture.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="MediaCap.Capture.Capture.RecFileModeType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Capture.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="MediaCap.Capture.Capture.VideoRenderer" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Capture.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="MediaCap.Capture.Capture.SampleGrabber" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Capture.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Delegate Name="MediaCap.Capture.Capture.HeFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Capture.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="MediaCap.Capture.Capture.CaptureDone" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Capture.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BF4GAEhYGaKnQORguQVDEKIYCYcNFBGL4DA0gOFKAgA=</HashCode>
+      <FileName>Capture.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

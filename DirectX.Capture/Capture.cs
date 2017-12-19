@@ -11,260 +11,9 @@ using DShowNET;
 namespace MediaCap.Capture
 {
 
-	/// <summary>
-	///  Use the Capture class to capture audio and video to AVI files.
-	/// </summary>
-	/// <remarks>
-	///  This is the core class of the Capture Class Library. The following 
-	///  sections introduce the Capture class and how to use this library.
-	///  
-	/// <br/><br/>
-	/// <para><b>Basic Usage</b></para>
-	/// 
-	/// <para>
-	///  The Capture class only requires a video device and/or audio device
-	///  to begin capturing. The <see cref="Filters"/> class provides
-	///  lists of the installed video and audio devices. 
-	/// </para>
-	/// <code><div style="background-color:whitesmoke;">
-	///  // Remember to add a reference to DirectX.Capture.dll
-	///  using DirectX.Capture
-	///  ...
-	///  Capture capture = new Capture( Filters.VideoInputDevices[0], 
-	///                                 Filters.AudioInputDevices[0] );
-	///  capture.Start();
-	///  ...
-	///  capture.Stop();
-	/// </div></code>
-	/// <para>
-	///  This will capture video and audio using the first video and audio devices
-	///  installed on the system. To capture video only, pass a null as the second
-	///  parameter of the constructor.
-	/// </para>
-	/// <para> 
-	///  The class is initialized to a valid temporary file in the Windows temp
-	///  folder. To capture to a different file, set the 
-	///  <see cref="Capture.Filename"/> property before you begin
-	///  capturing. Remember to add DirectX.Capture.dll to 
-	///  your project references.
-	/// </para>
-	///
-	/// <br/>
-	/// <para><b>Setting Common Properties</b></para>
-	/// 
-	/// <para>
-	///  The example below shows how to change video and audio settings. 
-	///  Properties such as <see cref="Capture.FrameRate"/> and 
-	///  <see cref="AudioSampleSize"/> allow you to programmatically adjust
-	///  the capture. Use <see cref="Capture.VideoCaps"/> and 
-	///  <see cref="Capture.AudioCaps"/> to determine valid values for these
-	///  properties.
-	/// </para>
-	/// <code><div style="background-color:whitesmoke;">
-	///  Capture capture = new Capture( Filters.VideoInputDevices[0], 
-	///                                 Filters.AudioInputDevices[1] );
-	///  capture.VideoCompressor = Filters.VideoCompressors[0];
-	///  capture.AudioCompressor = Filters.AudioCompressors[0];
-	///  capture.FrameRate = 29.997;
-	///  capture.FrameSize = new Size( 640, 480 );
-	///  capture.AudioSamplingRate = 44100;
-	///  capture.AudioSampleSize = 16;
-	///  capture.Filename = "C:\MyVideo.avi";
-	///  capture.Start();
-	///  ...
-	///  capture.Stop();
-	/// </div></code>
-	/// <para>
-	///  The example above also shows the use of video and audio compressors. In most 
-	///  cases you will want to use compressors. Uncompressed video can easily
-	///  consume over a 1GB of disk space per minute. Whenever possible, set 
-	///  the <see cref="Capture.VideoCompressor"/> and <see cref="Capture.AudioCompressor"/>
-	///  properties as early as possible. Changing them requires the internal filter
-	///  graph to be rebuilt which often causes most of the other properties to
-	///  be reset to default values.
-	/// </para>
-	///
-	/// <br/>
-	/// <para><b>Listing Devices</b></para>
-	/// 
-	/// <para>
-	///  Use the <see cref="Filters.VideoInputDevices"/> collection to list
-	///  video capture devices installed on the system.
-	/// </para>
-	/// <code><div style="background-color:whitesmoke;">
-	///  foreach ( Filter f in Filters.VideoInputDevices )
-	///  {
-	///		Debug.WriteLine( f.Name );
-	///  }
-	/// </div></code>
-	/// The <see cref="Filters"/> class also provides collections for audio 
-	/// capture devices, video compressors and audio compressors.
-	///
-	/// <br/>
-	/// <para><b>Preview</b></para>
-	/// 
-	/// <para>
-	///  Video preview is controled with the <see cref="Capture.PreviewWindow"/>
-	///  property. Setting this property to a visible control will immediately 
-	///  begin preview. Set to null to stop the preview. 
-	/// </para>
-	/// <code><div style="background-color:whitesmoke;">
-	///  // Enable preview
-	///  capture.PreviewWindow = myPanel;
-	///  // Disable preview
-	///  capture.PreviewWindow = null;
-	/// </div></code>
-	/// <para>
-	///  The control used must have a window handle (HWND), good controls to 
-	///  use are the Panel or the form itself.
-	/// </para>
-	/// <para>
-	///  Retrieving or changing video/audio settings such as FrameRate, 
-	///  FrameSize, AudioSamplingRate, and AudioSampleSize will cause
-	///  the preview window to flash. This is beacuse the preview must be
-	///  temporarily stopped. Disable the preview if you need to access
-	///  several properties at the same time.
-	/// </para>
-	/// 
-	/// <br/>
-	/// <para><b>Property Pages</b></para>
-	///  
-	/// <para>
-	///  Property pages exposed by the devices and compressors are
-	///  available through the <see cref="Capture.PropertyPages"/> 
-	///  collection.
-	/// </para>
-	/// <code><div style="background-color:whitesmoke;">
-	///  // Display the first property page
-	///  capture.PropertyPages[0].Show();
-	/// </div></code>
-	/// <para>
-	///  The property pages will often expose more settings than
-	///  the Capture class does directly. Some examples are brightness, 
-	///  color space, audio balance and bass boost. The disadvantage
-	///  to using the property pages is the user's choices cannot be
-	///  saved and later restored. The exception to this is the video
-	///  and audio compressor property pages. Most compressors support
-	///  the saving and restoring state, see the 
-	///  <see cref="PropertyPage.State"/> property for more information.
-	/// </para>
-	/// <para>
-	///  Changes made in the property page will be reflected 
-	///  immediately in the Capture class properties (e.g. Capture.FrameSize).
-	///  However, the reverse is not always true. A change made directly to
-	///  FrameSize, for example, may not be reflected in the associated
-	///  property page. Fortunately, the filter will use requested FrameSize
-	///  even though the property page shows otherwise.
-	/// </para>
-	/// 
-	/// <br/>
-	/// <para><b>Saving and Restoring Settings</b></para>
-	///  
-	/// <para>
-	///  To save the user's choice of devices and compressors, 
-	///  save <see cref="Filter.MonikerString"/> and user it later
-	///  to recreate the Filter object.
-	/// </para>
-	/// <para>
-	///  To save a user's choices from a property page use
-	///  <see cref="PropertyPage.State"/>. However, only the audio
-	///  and video compressor property pages support this.
-	/// </para>
-	/// <para>
-	///  The last items to save are the video and audio settings such
-	///  as FrameSize and AudioSamplingRate. When restoring, remember
-	///  to restore these properties after setting the video and audio
-	///  compressors.
-	/// </para>
-	/// <code><div style="background-color:whitesmoke;">
-	///  // Disable preview
-	///  capture.PreviewWindow = null;
-	///  
-	///  // Save settings
-	///  string videoDevice = capture.VideoDevice.MonikerString;
-	///  string audioDevice = capture.AudioDevice.MonikerString;
-	///  string videoCompressor = capture.VideoCompressor.MonikerString;
-	///  string audioCompressor = capture.AudioCompressor.MonikerString;
-	///  double frameRate = capture.FrameRate;
-	///  Size frameSize = capture.FrameSize;
-	///  short audioChannels = capture.AudioChannels;
-	///  short audioSampleSize = capture.AudioSampleSize;
-	///  int audioSamplingRate = capture.AudioSamplingRate;
-	///  ArrayList pages = new ArrayList();
-	///  foreach ( PropertyPage p in capture.PropertyPages )
-	///  {
-	///		if ( p.SupportsPersisting )
-	///			pages.Add( p.State );
-	///	}
-	///			
-	///  
-	///  // Restore settings
-	///  Capture capture = new Capture( new Filter( videoDevice), 
-	///				new Filter( audioDevice) );
-	///  capture.VideoCompressor = new Filter( videoCompressor );
-	///  capture.AudioCompressor = new Filter( audioCompressor );
-	///  capture.FrameRate = frameRate;
-	///  capture.FrameSize = frameSize;
-	///  capture.AudioChannels = audioChannels;
-	///  capture.AudioSampleSize = audioSampleSize;
-	///  capture.AudioSamplingRate = audioSamplingRate;
-	///  foreach ( PropertyPage p in capture.PropertyPages )
-	///  {
-	///		if ( p.SupportsPersisting )
-	///		{
-	///			p.State = (byte[]) pages[0]
-	///			pages.RemoveAt( 0 );
-	///		}
-	///	 }
-	///  // Enable preview
-	///  capture.PreviewWindow = myPanel;
-	/// </div></code>
-	///  
-	/// <br/>
-	/// 
-	/// <br/>
-	/// <para><b>Troubleshooting</b></para>
-	/// 
-	/// <para>
-	///  This class library uses COM Interop to access the full
-	///  capabilities of DirectShow, so if there is another
-	///  application that can successfully use a hardware device
-	///  then it should be possible to modify this class library
-	///  to use the device.
-	/// </para>
-	/// <para>
-	///  Try the <b>AMCap</b> sample from the DirectX SDK 
-	///  (DX9\Samples\C++\DirectShow\Bin\AMCap.exe) or 
-	///  <b>Virtual VCR</b> from http://www.DigTV.ws 
-	/// </para>
-	/// 
-	/// <br/>
-	/// <para><b>Credits</b></para>
-	/// 
-	/// <para>
-	///  This class library would not be possible without the
-	///  DirectShowLib project by NETMaster: 
-	///  http://www.codeproject.com/useritems/directshownet.asp
-	/// </para>
-	/// <para>
-	///  Documentation is generated by nDoc available at
-	///  http://ndoc.sourceforge.net
-	/// </para>
-	/// 
-	/// <br/>
-	/// <para><b>Feedback</b></para>
-	/// 
-	///  Feel free to send comments and questions to me at
-	///  mportobello@hotmail.com. If the the topic may be of interest
-	///  to others, post your question on the www.codeproject.com
-	///  page for DirectX.Capture.
-	/// </remarks>
+	
 	public partial class Capture : ISampleGrabberCB
     {
-
-		// ------------------ Private Enumerations --------------------
-
-		/// <summary> Possible states of the interal filter graph </summary>
 		public enum GraphState
 		{
 			Null,			// No filter graph at all
@@ -282,37 +31,18 @@ namespace MediaCap.Capture
 			Avi
 		}
 
-        // ------------------ Public Properties --------------------
-
 		/// <summary> Is the class currently capturing. Read-only. </summary>
 		public bool Capturing => graphState==GraphState.Capturing;
 
         /// <summary> Has the class been cued to begin capturing. Read-only. </summary>
 		public bool Cued => isCaptureRendered && graphState==GraphState.Rendered;
 
-        /// <summary> Is the class currently stopped. Read-only. </summary>
+        /// <summary>
+        /// Is the class currently stopped. Read-only.
+        /// </summary>
 		public bool Stopped => graphState != GraphState.Capturing;
 
-        /// <summary> 
-		///  Name of file to capture to. Initially set to
-		///  a valid temporary file.
-		/// </summary>		
-		/// <remarks>
-		///  If the file does not exist, it will be created. If it does 
-		///  exist, it will be overwritten. An overwritten file will 
-		///  not be shortened if the captured data is smaller than the 
-		///  original file. The file will be valid, it will just contain 
-		///  extra, unused, data after the audio/video data. 
-		/// 
-		/// <para>
-		///  A future version of this class will provide a method to copy 
-		///  only the valid audio/video data to a new file. </para>
-		/// 
-		/// <para>
-		///  This property cannot be changed while capturing or cued. </para>
-		/// </remarks> 
-		
-		public string Filename 
+        public string Filename 
 		{ 
 			get => filename;
             set 
@@ -336,10 +66,7 @@ namespace MediaCap.Capture
 				}
 			} 
 		}
-
-		/// <summary>
-		/// Recording file modes
-		/// </summary>
+        
 		public RecFileModeType RecFileMode
 		{
 			get => recFileMode;
@@ -358,22 +85,7 @@ namespace MediaCap.Capture
 			}
 		}
         
-        /// <summary>
-		///  The control that will host the preview window. 
-		/// </summary>
-		/// <remarks>
-		///  Setting this property will begin video preview
-		///  immediately. Set this property after setting all
-		///  other properties to avoid unnecessary changes
-		///  to the internal filter graph (some properties like
-		///  FrameSize require the internal filter graph to be 
-		///  stopped and disconnected before the property
-		///  can be retrieved or set).
-		///  
-		/// <para>
-		///  To stop video preview, set this property to null. </para>
-		/// </remarks>
-		public Control PreviewWindow
+        public Control PreviewWindow
 		{
 			get => previewWindow;
             set
@@ -387,29 +99,6 @@ namespace MediaCap.Capture
 			}
 		}
 
-
-		/// <summary>
-		///  The capabilities of the video device.
-		/// </summary>
-		/// <remarks>
-		///  It may be required to cue the capture (see <see cref="Cue"/>) 
-		///  before all capabilities are correctly reported. If you 
-		///  have such a device, the developer would be interested to
-		///  hear from you.
-		/// 
-		/// <para>
-		///  The information contained in this property is retrieved and
-		///  cached the first time this property is accessed. Future
-		///  calls to this property use the cached results. This was done 
-		///  for performance. </para>
-		///  
-		/// <para>
-		///  However, this means <b>you may get different results depending 
-		///  on when you access this property first</b>. If you are experiencing 
-		///  problems, try accessing the property immediately after creating 
-		///  the Capture class or immediately after setting the video and 
-		///  audio compressors. Also, inform the developer. </para>
-		/// </remarks>
 		public VideoCapabilities VideoCaps 
 		{ 
 			get 
@@ -429,28 +118,6 @@ namespace MediaCap.Capture
 			}
 		}
 
-		/// <summary>
-		///  The capabilities of the audio device.
-		/// </summary>
-		/// <remarks>
-		///  It may be required to cue the capture (see <see cref="Cue"/>) 
-		///  before all capabilities are correctly reported. If you 
-		///  have such a device, the developer would be interested to
-		///  hear from you.
-		/// 
-		/// <para>
-		///  The information contained in this property is retrieved and
-		///  cached the first time this property is accessed. Future
-		///  calls to this property use the cached results. This was done 
-		///  for performance. </para>
-		///  
-		/// <para>
-		///  However, this means <b>you may get different results depending 
-		///  on when you access this property first</b>. If you are experiencing 
-		///  problems, try accessing the property immediately after creating 
-		///  the Capture class or immediately after setting the video and 
-		///  audio compressors. Also, inform the developer. </para>
-		/// </remarks>
 		public AudioCapabilities AudioCaps 
 		{ 
 			get 
